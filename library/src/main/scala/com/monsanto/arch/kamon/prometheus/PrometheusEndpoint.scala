@@ -16,13 +16,11 @@ import spray.routing.Directives
   *
   * @author Daniel Solano Gómez
   */
-class PrometheusEndpoint(settings: PrometheusSettings)(implicit val actorRefFactory: ActorRefFactory) {
+class PrometheusEndpoint(settings: PrometheusSettings, snapshot: AtomicReference[Seq[MetricFamily]])(implicit val actorRefFactory: ActorRefFactory) {
   import PrometheusEndpoint.{ProtoBufContentType, TextContentType}
 
   /** Converts snapshots from Kamon’s native type to the one used by this extension. */
   private val snapshotConverter = new SnapshotConverter(settings)
-  /** Mutable cell with the latest snapshot. */
-  private val snapshot = new AtomicReference[Seq[MetricFamily]]
 
   /** Marshals a snapshot to the text exposition format. */
   private val textMarshaller: ToResponseMarshaller[Seq[MetricFamily]] =
@@ -47,8 +45,10 @@ class PrometheusEndpoint(settings: PrometheusSettings)(implicit val actorRefFact
       compressResponseIfRequested() {
         dynamic {
           Option(snapshot.get) match {
-            case Some(s) => complete(s)
-            case None => complete(StatusCodes.NoContent)
+            case Some(s) =>
+              complete(s)
+            case None =>
+              complete(StatusCodes.NoContent)
           }
         }
       }

@@ -1,9 +1,13 @@
 package com.monsanto.arch.kamon.prometheus
 
+import java.util.concurrent.atomic.AtomicReference
+
 import akka.actor.ExtendedActorSystem
 import akka.event.Logging
+import com.monsanto.arch.kamon.prometheus.metric.MetricFamily
 import kamon.Kamon
 import kamon.metric.TickMetricSnapshotBuffer
+import kamon.metric.TickMetricSnapshotBuffer.FlushBuffer
 import spray.routing.Route
 
 /** A Kamon extension that provides a Spray endpoint so that Prometheus can retrieve metrics from Kamon.
@@ -27,8 +31,11 @@ class PrometheusExtension(system: ExtendedActorSystem) extends Kamon.Extension {
     */
   val isBuffered: Boolean = settings.refreshInterval > Kamon.metrics.settings.tickInterval
 
+  /** Mutable cell with the latest snapshot. */
+  private val snapshot = new AtomicReference[Seq[MetricFamily]]
+
   /** Manages the Spray endpoint. */
-  private val endpoint = new PrometheusEndpoint(settings)(system)
+  private val endpoint = new PrometheusEndpoint(settings, snapshot)(system)
   /** Listens to and records metrics. */
   private[prometheus] val listener = system.actorOf(PrometheusListener.props(endpoint), "prometheus-listener")
   /** If the listener needs to listen less frequently than ticks, set up a buffer. */
@@ -42,6 +49,13 @@ class PrometheusExtension(system: ExtendedActorSystem) extends Kamon.Extension {
 
   /** The Spray endpoint. */
   val route: Route = endpoint.route
+
+  /** For internal use (healthchecks, other routes, etc.) */
+  def requestSnapshot() = Option(snapshot.get())
+
+  def flushBuffer() = {
+    buffer ! FlushBuffer
+  }
 
   log.info("Starting the Kamon(Prometheus) extension")
   settings.subscriptions.foreach {case (category, selections) ⇒

@@ -91,7 +91,7 @@ class DemoServiceActor extends TracingHttpServiceActor {
   /** This directive creates the metrics endpoint at `/metrics` and names all traces which end up here ‘metrics’. */
   val metricsRoute =
     path("metrics") {
-      Kamon(Prometheus).route
+      Prometheus(context.system).route
     }
 }
 

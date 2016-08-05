@@ -2,7 +2,9 @@ package com.monsanto.arch.kamon.prometheus.converter
 
 import java.util.concurrent.{ArrayBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
+import akka.actor.ActorSystem
 import akka.kamon.instrumentation.AkkaDispatcherMetrics
+import akka.testkit.TestKit
 import com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter.{KamonCategoryLabel, KamonNameLabel}
 import com.monsanto.arch.kamon.prometheus.metric.PrometheusType.Counter
 import com.monsanto.arch.kamon.prometheus.metric._
@@ -16,19 +18,20 @@ import kamon.metric.instrument.{InstrumentFactory, Memory, Time, UnitOfMeasureme
 import kamon.util.executors.{ForkJoinPoolMetrics, ThreadPoolExecutorMetrics}
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.{LoneElement, Matchers, WordSpec}
+import org.scalatest.{BeforeAndAfterAll, LoneElement, Matchers, WordSpecLike}
 
 import scala.concurrent.forkjoin.ForkJoinPool
 
 /** Tests for the conversion of Kamon TickMetricSnapshot instances into our own MetricFamily instances. */
-class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers with GeneratorDrivenPropertyChecks with LoneElement {
+class SnapshotConverterSpec extends KamonTestKit("SnapshotConverterSpec") with GeneratorDrivenPropertyChecks with LoneElement {
+
   def handle = afterWord("handle")
 
   def _have = afterWord("have")
 
   def are = afterWord("are")
 
-  def converter = new SnapshotConverter(Kamon(Prometheus).settings)
+  def converter = new SnapshotConverter(Prometheus(system).settings)
 
   "a snapshot converter" should handle {
     "empty ticks" in {
@@ -127,6 +130,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter"
+          removeCounter(entity)
         }
 
         "nanoseconds" in {
@@ -134,6 +138,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_nanoseconds"
+          removeCounter(entity)
         }
 
         "microseconds" in {
@@ -141,6 +146,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_microseconds"
+          removeCounter(entity)
         }
 
         "milliseconds" in {
@@ -148,6 +154,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_milliseconds"
+          removeCounter(entity)
         }
 
         "seconds" in {
@@ -155,6 +162,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_seconds"
+          removeCounter(entity)
         }
 
         "bytes" in {
@@ -162,6 +170,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_bytes"
+          removeCounter(entity)
         }
 
         "kilobytes" in {
@@ -169,6 +178,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_kilobytes"
+          removeCounter(entity)
         }
 
         "megabytes" in {
@@ -176,6 +186,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_megabytes"
+          removeCounter(entity)
         }
 
         "gigabytes" in {
@@ -183,6 +194,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_gigabytes"
+          removeCounter(entity)
         }
 
         "hours (custom time type)" in {
@@ -190,6 +202,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_h"
+          removeCounter(entity)
         }
 
         "terabytes (custom memory type)" in {
@@ -197,6 +210,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_Tb"
+          removeCounter(entity)
         }
 
         "joules (custom type)" in {
@@ -204,6 +218,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter_J"
+          removeCounter(entity)
         }
 
         "celsius (mungeable custom type)" in {
@@ -211,6 +226,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "counter__C"
+          removeCounter(entity)
         }
       }
     }
@@ -239,6 +255,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
         result.loneElement shouldBe
           MetricFamily(name, PrometheusType.Histogram, None,
             Seq(Metric(metricValue, end, labels)))
+        removeHistogram(entity)
       }
 
       "valid names" in {
@@ -259,6 +276,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           }
           val result = converter(tick)
           result.loneElement shouldBe expected
+          removeHistogram(entity)
         }
       }
 
@@ -271,6 +289,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val mungedName = Mungers.asMetricName(name)
 
           result.loneElement.name shouldBe mungedName
+          removeHistogram(entity)
         }
       }
 
@@ -283,6 +302,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
 
           result.loneElement.metrics.loneElement.labels shouldBe
             (tags ++ Map(KamonCategoryLabel → SingleInstrumentEntityRecorder.Histogram, KamonNameLabel → name))
+          removeHistogram(entity)
         }
       }
 
@@ -302,6 +322,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val mungedTag = Map(Mungers.asLabelName(key) → value)
           result.loneElement.metrics.loneElement.labels shouldBe
             (mungedTag ++ Map(KamonCategoryLabel → SingleInstrumentEntityRecorder.Histogram, KamonNameLabel → name))
+          removeHistogram(entity)
         }
       }
 
@@ -329,6 +350,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               Seq(
                 Metric(value1, end, tags1 ++ extraLabels),
                 Metric(value2, end, tags2 ++ extraLabels))
+            removeHistogram(entity1)
+            removeHistogram(entity2)
           }
         }
       }
@@ -341,6 +364,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram"
+          removeHistogram(entity)
         }
 
         "nanoseconds" in {
@@ -348,6 +372,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_nanoseconds"
+          removeHistogram(entity)
         }
 
         "microseconds" in {
@@ -355,6 +380,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_microseconds"
+          removeHistogram(entity)
         }
 
         "milliseconds" in {
@@ -362,6 +388,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_milliseconds"
+          removeHistogram(entity)
         }
 
         "seconds" in {
@@ -369,6 +396,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_seconds"
+          removeHistogram(entity)
         }
 
         "bytes" in {
@@ -376,6 +404,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_bytes"
+          removeHistogram(entity)
         }
 
         "kilobytes" in {
@@ -383,6 +412,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_kilobytes"
+          removeHistogram(entity)
         }
 
         "megabytes" in {
@@ -390,6 +420,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_megabytes"
+          removeHistogram(entity)
         }
 
         "gigabytes" in {
@@ -397,6 +428,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_gigabytes"
+          removeHistogram(entity)
         }
 
         "hours (custom time type)" in {
@@ -404,6 +436,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_h"
+          removeHistogram(entity)
         }
 
         "terabytes (custom memory type)" in {
@@ -411,6 +444,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_Tb"
+          removeHistogram(entity)
         }
 
         "joules (custom type)" in {
@@ -418,6 +452,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram_J"
+          removeHistogram(entity)
         }
 
         "celsius (mungeable custom type)" in {
@@ -425,6 +460,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "histogram__C"
+          removeHistogram(entity)
         }
       }
     }
@@ -443,6 +479,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
         val result = converter(tick)
 
         result.loneElement shouldBe expected
+        removeMinMaxCounter(entity)
       }
 
       "arbitrary values" in {
@@ -453,6 +490,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val value = MetricValue.Histogram(tick.metrics(entity).minMaxCounter("min-max-counter").get)
           val result = converter(tick)
           result.loneElement.metrics.loneElement.value shouldBe value
+          removeMinMaxCounter(entity)
         }
       }
 
@@ -464,6 +502,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.name shouldBe name
           result.loneElement.metrics.loneElement.labels(KamonNameLabel) shouldBe name
+          removeMinMaxCounter(entity)
         }
       }
 
@@ -475,6 +514,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.name shouldBe Mungers.asMetricName(name)
           result.loneElement.metrics.loneElement.labels(KamonNameLabel) shouldBe name
+          removeMinMaxCounter(entity)
         }
       }
 
@@ -487,6 +527,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.metrics.loneElement.labels shouldBe
             (tags ++ Map(KamonCategoryLabel → SingleInstrumentEntityRecorder.MinMaxCounter, KamonNameLabel → name))
+          removeMinMaxCounter(entity)
         }
       }
 
@@ -505,6 +546,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             KamonCategoryLabel → SingleInstrumentEntityRecorder.MinMaxCounter,
             KamonNameLabel → name)
           result.loneElement.metrics.loneElement.labels shouldBe mungedTags
+          removeMinMaxCounter(entity)
         }
       }
 
@@ -521,6 +563,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             val result = converter(tick)
 
             result.loneElement.metrics.map(_.labels) shouldBe Seq(tags1 ++ commonLabels, tags2 ++ commonLabels)
+            removeMinMaxCounter(entity1)
+            removeMinMaxCounter(entity2)
           }
         }
       }
@@ -533,6 +577,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter"
+          removeMinMaxCounter(entity)
         }
 
         "nanoseconds" in {
@@ -540,6 +585,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_nanoseconds"
+          removeMinMaxCounter(entity)
         }
 
         "microseconds" in {
@@ -547,6 +593,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_microseconds"
+          removeMinMaxCounter(entity)
         }
 
         "milliseconds" in {
@@ -554,6 +601,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_milliseconds"
+          removeMinMaxCounter(entity)
         }
 
         "seconds" in {
@@ -561,6 +609,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_seconds"
+          removeMinMaxCounter(entity)
         }
 
         "bytes" in {
@@ -568,6 +617,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_bytes"
+          removeMinMaxCounter(entity)
         }
 
         "kilobytes" in {
@@ -575,6 +625,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_kilobytes"
+          removeMinMaxCounter(entity)
         }
 
         "megabytes" in {
@@ -582,6 +633,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_megabytes"
+          removeMinMaxCounter(entity)
         }
 
         "gigabytes" in {
@@ -589,6 +641,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_gigabytes"
+          removeMinMaxCounter(entity)
         }
 
         "hours (custom time type)" in {
@@ -596,6 +649,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_h"
+          removeMinMaxCounter(entity)
         }
 
         "terabytes (custom memory type)" in {
@@ -603,6 +657,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_Tb"
+          removeMinMaxCounter(entity)
         }
 
         "joules (custom type)" in {
@@ -610,6 +665,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter_J"
+          removeMinMaxCounter(entity)
         }
 
         "celsius (mungeable custom type)" in {
@@ -617,6 +673,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "minMaxCounter__C"
+          removeMinMaxCounter(entity)
         }
       }
     }
@@ -642,6 +699,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
 
         result.loneElement shouldBe
           MetricFamily(name, PrometheusType.Histogram, None, Seq(Metric(value, end, labels)))
+        removeEntity(entity)
       }
 
       "arbitrary values" in {
@@ -652,6 +710,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val value = MetricValue.Histogram(tick.metrics(entity).gauge("gauge").get)
           val result = converter(tick)
           result.loneElement.metrics.loneElement.value shouldBe value
+          removeEntity(entity)
         }
       }
 
@@ -663,6 +722,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.name shouldBe name
           result.loneElement.metrics.loneElement.labels(KamonNameLabel) shouldBe name
+          removeEntity(entity)
         }
       }
 
@@ -674,6 +734,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.name shouldBe Mungers.asMetricName(name)
           result.loneElement.metrics.loneElement.labels(KamonNameLabel) shouldBe name
+          removeEntity(entity)
         }
       }
 
@@ -686,6 +747,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result.loneElement.metrics.loneElement.labels shouldBe
             (tags ++ Map(KamonCategoryLabel → SingleInstrumentEntityRecorder.Gauge, KamonNameLabel → name))
+          removeEntity(entity)
         }
       }
 
@@ -704,6 +766,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             KamonCategoryLabel → SingleInstrumentEntityRecorder.Gauge,
             KamonNameLabel → name)
           result.loneElement.metrics.loneElement.labels shouldBe mungedTags
+          removeEntity(entity)
         }
       }
 
@@ -720,6 +783,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             val result = converter(tick)
 
             result.loneElement.metrics.map(_.labels) shouldBe Seq(tags1 ++ commonLabels, tags2 ++ commonLabels)
+            removeGauge(entity1)
+            removeGauge(entity2)
           }
         }
       }
@@ -732,6 +797,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge"
+          removeGauge(entity)
         }
 
         "nanoseconds" in {
@@ -739,6 +805,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_nanoseconds"
+          removeGauge(entity)
         }
 
         "microseconds" in {
@@ -746,6 +813,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_microseconds"
+          removeGauge(entity)
         }
 
         "milliseconds" in {
@@ -753,6 +821,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_milliseconds"
+          removeGauge(entity)
         }
 
         "seconds" in {
@@ -760,6 +829,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_seconds"
+          removeGauge(entity)
         }
 
         "bytes" in {
@@ -767,6 +837,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_bytes"
+          removeGauge(entity)
         }
 
         "kilobytes" in {
@@ -774,6 +845,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_kilobytes"
+          removeGauge(entity)
         }
 
         "megabytes" in {
@@ -781,6 +853,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_megabytes"
+          removeGauge(entity)
         }
 
         "gigabytes" in {
@@ -788,6 +861,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_gigabytes"
+          removeGauge(entity)
         }
 
         "hours (custom time type)" in {
@@ -795,6 +869,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_h"
+          removeGauge(entity)
         }
 
         "terabytes (custom memory type)" in {
@@ -802,6 +877,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_Tb"
+          removeGauge(entity)
         }
 
         "joules (custom type)" in {
@@ -809,6 +885,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge_J"
+          removeGauge(entity)
         }
 
         "celsius (mungeable custom type)" in {
@@ -816,6 +893,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val tick = snapshotOf(entity)
           val result = converter(tick)
           result.loneElement.name shouldBe "gauge__C"
+          removeGauge(entity)
         }
       }
     }
@@ -862,6 +940,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               Seq(Metric(MetricValue.Counter(42), end, labels))),
             MetricFamily("dual_counter_count_2", PrometheusType.Counter, None,
               Seq(Metric(MetricValue.Counter(1), end, labels))))
+        removeEntity(entity)
       }
 
       "arbitrary values" in {
@@ -879,6 +958,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
                 Seq(Metric(MetricValue.Counter(count1), end, labels))),
               MetricFamily("dual_counter_count_2", PrometheusType.Counter, None,
                 Seq(Metric(MetricValue.Counter(count2), end, labels))))
+
+          removeEntity(entity)
         }
       }
 
@@ -891,6 +972,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result should have size 2
           all(result.map(_.metrics.loneElement.labels)) shouldBe (tags ++ commonLabels)
+          removeEntity(entity)
         }
       }
 
@@ -910,6 +992,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               KamonNameLabel → name)
             result should have size 2
             all(result.map(_.metrics.loneElement.labels)) shouldBe mungedTags
+            removeEntity(entity)
           }
         }
       }
@@ -928,6 +1011,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             result should have size 2
             all(result.map(_.metrics.map(_.labels))) should
               contain theSameElementsAs Seq(tags1 ++ commonLabels, tags2 ++ commonLabels)
+            removeEntity(entity1)
+            removeEntity(entity2)
           }
         }
       }
@@ -995,6 +1080,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             MetricFamily("sm_rg_sbord_a_gauge", PrometheusType.Histogram, None,
               Seq(Metric(MetricValue.Histogram(gaugeBuckets, 3, 45), end, labels)))
           )
+
+        removeEntity(entity)
       }
 
       "arbitrary values" in {
@@ -1031,6 +1118,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               MetricFamily("sm_rg_sbord_a_gauge", PrometheusType.Histogram, None,
                 Seq(Metric(gaugeValue, end, labels)))
             )
+
+          removeEntity(entity)
         }
       }
 
@@ -1043,6 +1132,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
           val result = converter(tick)
           result should have size 4
           all(result.map(_.metrics.loneElement.labels)) shouldBe (tags ++ commonLabels)
+          removeEntity(entity)
         }
       }
 
@@ -1061,6 +1151,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             val mungedTags = Map(Mungers.asLabelName(key) → value) ++ commonLabels
             result should have size 4
             all(result.map(_.metrics.loneElement.labels)) shouldBe mungedTags
+            removeEntity(entity)
           }
         }
       }
@@ -1079,6 +1170,8 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             result should have size 4
             all(result.map(_.metrics.map(_.labels))) should
               contain theSameElementsAs Seq(tags1 ++ commonLabels, tags2 ++ commonLabels)
+            removeEntity(entity1)
+            removeEntity(entity2)
           }
         }
       }
@@ -1134,6 +1227,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             MetricFamily("akka_actor_errors", PrometheusType.Counter, Some(AkkaActorErrorsHelp),
               Seq(Metric(errorsValue, end, labels)))
           )
+          removeEntity(entity)
         }
       }
 
@@ -1185,6 +1279,9 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
         errorsMetricFamily.get.metrics should contain theSameElementsAs Seq(
           Metric(MetricValue.Counter(1), end, labels1),
           Metric(MetricValue.Counter(2), end, labels2))
+
+        removeEntity(entity1)
+        removeEntity(entity2)
       }
     }
 
@@ -1233,6 +1330,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
             PrometheusType.Histogram,
             Some(AkkaForkJoinPoolDispatcherQueuedTaskCountHelp),
             Seq(Metric(MetricValue.Histogram(tick.metrics(entity).gauge("queued-task-count").get), end, labels))))
+        removeEntity(entity)
       }
 
       "a thread pool executor" in {
@@ -1279,6 +1377,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               PrometheusType.Histogram,
               Some(AkkaThreadPoolExecutorDispatcherProcessedTasksHelp),
               Seq(Metric(MetricValue.Histogram(tick.metrics(entity).gauge("processed-tasks").get), end, labels))))
+        removeEntity(entity)
       }
     }
 
@@ -1328,6 +1427,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               PrometheusType.Counter,
               Some(AkkaRouterErrorsHelp),
               Seq(Metric(MetricValue.Counter(tick.metrics(entity).counter("errors").get.count), end, labels))))
+        removeEntity(entity)
       }
     }
 
@@ -1348,6 +1448,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               Map("foo" → "bar",
                 KamonCategoryLabel → SingleInstrumentEntityRecorder.Counter,
                 KamonNameLabel → name))))
+        removeEntity(entity)
       }
 
       "additional labels that require munging are specified" in {
@@ -1366,6 +1467,7 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
               Map("needs_munging" → "bar",
                 KamonCategoryLabel → SingleInstrumentEntityRecorder.Counter,
                 KamonNameLabel → name))))
+        removeEntity(entity)
       }
     }
   }
@@ -1373,11 +1475,13 @@ class SnapshotConverterSpec extends WordSpec with KamonTestKit with Matchers wit
 
 object SnapshotConverterSpec {
   case object Joules extends UnitOfMeasurement {
+    override def canScale(toUnit: UnitOfMeasurement): Boolean = false
     override val name = "energy"
     override val label = "J"
   }
 
   case object Celsius extends UnitOfMeasurement {
+    override def canScale(toUnit: UnitOfMeasurement): Boolean = false
     override val name = "temperature"
     override val label = "°C"
   }

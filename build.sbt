@@ -1,19 +1,21 @@
 import java.util.Date
 import sbtprotobuf.ProtobufPlugin
 
-val akkaVersion = "2.3.14"
+val akkaVersion = "2.4.6"
 val sprayVersion = "1.3.3"
-val kamonVersion = "0.5.2"
+val kamonVersion = "0.6.2"
+scalaVersion in ThisBuild := "2.11.7"
 
 lazy val commonSettings = Seq(
   homepage := Some(url("https://monsantoco.github.io/kamon-prometheus")),
   organization := "com.monsanto.arch",
   organizationHomepage := Some(url("http://engineering.monsanto.org")),
   licenses := Seq("BSD New" → url("http://opensource.org/licenses/BSD-3-Clause")),
-  scalaVersion := "2.11.7",
+  scalaVersion := scalaVersion.value,
   scalacOptions ++= Seq(
     "-deprecation",
-    "-unchecked"
+    "-unchecked",
+    "-encoding", "utf8"
   ),
   resolvers += Resolver.jcenterRepo,
   apiMappingsScala ++= Map(
@@ -65,6 +67,7 @@ lazy val library = (project in file("library"))
       "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
       "com.typesafe"            % "config"                   % "1.3.0",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4" % "provided",
+      //"org.slf4j" % "slf4j-simple" % "1.7.21",
       // -- testing --
       "org.scalatest"     %% "scalatest"     % "2.2.5"      % "test",
       "com.typesafe.akka" %% "akka-testkit"  % akkaVersion  % "test",

@@ -3,6 +3,7 @@ package com.monsanto.arch.kamon.prometheus
 import akka.ConfigurationException
 import com.typesafe.config.{Config, ConfigFactory}
 import kamon.Kamon
+import kamon.metric.MetricsModule
 import kamon.util.ConfigTools.Syntax
 
 import scala.collection.JavaConversions
@@ -18,6 +19,8 @@ import scala.concurrent.duration.FiniteDuration
 class PrometheusSettings(config: Config) {
   config.checkValid(ConfigFactory.defaultReference(), "kamon.prometheus")
   private val prometheusConfig = config.getConfig("kamon.prometheus")
+
+  private def metrics: MetricsModule = Kamon.metrics
 
   /** The extension’s endpoint will serve new results according to this value. */
   val refreshInterval: FiniteDuration = prometheusConfig.getFiniteDuration("refresh-interval")
@@ -39,8 +42,8 @@ class PrometheusSettings(config: Config) {
   }
 
   // ensure that the refresh interval is not less than the tick interval
-  if (refreshInterval < Kamon.metrics.settings.tickInterval) {
-    val msg = s"The Prometheus refresh interval (${refreshInterval.toCoarsest}) must be equal to or greater than the Kamon tick interval (${Kamon.metrics.settings.tickInterval.toCoarsest})"
+  if (refreshInterval < metrics.settings.tickInterval) {
+    val msg = s"The Prometheus refresh interval (${refreshInterval.toCoarsest}) must be equal to or greater than the Kamon tick interval (${metrics.settings.tickInterval.toCoarsest})"
     throw new ConfigurationException(msg)
   }
 }

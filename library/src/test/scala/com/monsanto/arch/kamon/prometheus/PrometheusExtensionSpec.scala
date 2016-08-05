@@ -1,12 +1,13 @@
 package com.monsanto.arch.kamon.prometheus
 
 import com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter
+import com.monsanto.arch.kamon.prometheus.metric.MetricValue.{Bucket, Counter, Histogram}
 import com.monsanto.arch.kamon.prometheus.metric._
 import kamon.Kamon
 import kamon.metric.SingleInstrumentEntityRecorder
 import kamon.util.MilliTimestamp
 import org.scalactic.Uniformity
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import spray.http.HttpHeaders.{Accept, `Accept-Encoding`}
 import spray.http.{HttpEncodings, HttpResponse, MediaType, StatusCodes}
 import spray.httpx.encoding.Gzip
@@ -20,7 +21,14 @@ import scala.collection.immutable.ListMap
   *
   * @author Daniel Solano Gómez
   */
-class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestRouteTest with Matchers {
+class PrometheusExtensionSpec extends WordSpec with ScalatestRouteTest with KamonTestLike with Matchers with BeforeAndAfterAll {
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    Kamon.start()
+    clearMetrics()
+  }
+
   /** Unmarshaller from the text format. */
   val textUnmarshaller =
     Unmarshaller.delegate[String, Seq[MetricFamily]](PrometheusEndpoint.TextMediaType)(TextFormat.parse)
@@ -38,20 +46,24 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
       }
     }
   }
+  lazy val ext = kamonSystem.extension(Prometheus)
 
   "The Prometheus extension" should {
     "be available from Kamon" in {
-      Kamon(Prometheus) should not be null
+      ext should not be null
     }
     "provide a spray endpoint" in {
-      Kamon(Prometheus).route should not be null
+      ext.route should not be null
     }
   }
 
   "The Prometheus extension endpoint" when {
     "it has no snapshots" should {
+
+      def doGet(): RouteResult = Get() ~> ext.route
+
       "returns an empty response" in {
-        Get() ~> Kamon(Prometheus).route ~> check {
+        doGet() ~> check {
           handled shouldBe true
           status shouldBe StatusCodes.NoContent
         }
@@ -59,7 +71,8 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     }
 
     "doing a plain-text request" when {
-      def doGet() = Get() ~> Kamon(Prometheus).route
+
+      def doGet(): RouteResult = Get() ~> ext.route
 
       "it has content" should {
         "handle GET requests" in new WithData {
@@ -98,7 +111,9 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     }
 
     "doing a plain-text request accepting gzip compression" when {
-      def doGet() = Get() ~> `Accept-Encoding`(HttpEncodings.gzip) ~> Kamon(Prometheus).route
+      
+      def doGet(): RouteResult =
+        Get().withHeaders(`Accept-Encoding`(HttpEncodings.gzip)) ~> ext.route
 
       "it has content" should {
         "handle GET requests" in new WithData {
@@ -137,7 +152,8 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     }
 
     "doing a protocol buffer request" when {
-      def doGet() = Get() ~> Accept(PrometheusEndpoint.ProtoBufMediaType) ~> Kamon(Prometheus).route
+      def doGet(): RouteResult =
+        Get().withHeaders(Accept(PrometheusEndpoint.ProtoBufMediaType)) ~> ext.route
 
       "it has content" should {
         "handle GET requests" in new WithData {
@@ -169,10 +185,11 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     }
 
     "doing a protocol buffer request accepting gzip compression" when {
-      def doGet() = Get() ~>
-        `Accept-Encoding`(HttpEncodings.gzip) ~>
-        Accept(PrometheusEndpoint.ProtoBufMediaType) ~>
-        Kamon(Prometheus).route
+
+      def doGet(): RouteResult = Get().withHeaders(
+          `Accept-Encoding`(HttpEncodings.gzip), Accept(PrometheusEndpoint.ProtoBufMediaType)
+        ) ~> ext.route
+
 
       "it has content" should {
         "handle GET requests" in new WithData {
@@ -235,7 +252,13 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     override def normalized(metricFamily: MetricFamily): MetricFamily = {
       val normalMetrics = metricFamily.metrics.map { m ⇒
         val sortedLabels = ListMap(m.labels.toSeq.sortWith(_._1 < _._2): _*)
-        Metric(m.value, new MilliTimestamp(0), sortedLabels)
+        val value = m.value match {
+          case x: Histogram =>
+            Histogram(Seq(Bucket(Double.PositiveInfinity, 0)),0, 0)
+          case y: Counter =>
+            Counter(0)
+        }
+        Metric(value, new MilliTimestamp(0), sortedLabels)
       }.sortWith(metricSort)
       MetricFamily(metricFamily.name, metricFamily.prometheusType, metricFamily.help, normalMetrics)
     }
@@ -294,5 +317,8 @@ class PrometheusExtensionSpec extends WordSpec with KamonTestKit with ScalatestR
     mmc.increment(3)
     mmc.decrement(2)
     flushSubscriptions()
+    Thread.sleep(500)
+    ext.flushBuffer()
+    Thread.sleep(500)
   }
 }
