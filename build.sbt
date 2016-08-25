@@ -56,7 +56,7 @@ lazy val BufferedConfigTest = config("buffered-config-test").extend(Test)
 lazy val InvalidConfigTest = config("invalid-config-test").extend(Test)
 val testConfigs = "test, buffered-config-test, invalid-config-test"
 
-lazy val library = (project in file("library"))
+lazy val core = Project("kamon-prometheus-core", file("kamon-prometheus-core"))
   .configs(BufferedConfigTest, InvalidConfigTest)
   .disablePlugins(sbtassembly.AssemblyPlugin)
   .settings(
@@ -65,7 +65,7 @@ lazy val library = (project in file("library"))
     ProtobufPlugin.protobufSettings,
     inConfig(BufferedConfigTest)(Defaults.testSettings),
     inConfig(InvalidConfigTest)(Defaults.testSettings),
-    name := "kamon-prometheus",
+    name := "kamon-prometheus-core",
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
       "io.kamon"               %% "kamon-core"               % kamonVersion,
@@ -97,7 +97,7 @@ lazy val library = (project in file("library"))
   )
 
 lazy val demo = (project in file("demo"))
-  .dependsOn(library)
+  .dependsOn(core)
   .enablePlugins(DockerPlugin)
   .settings(
     commonSettings,
@@ -187,7 +187,7 @@ lazy val ghPagesSettings =
 lazy val `kamon-prometheus` = (project in file("."))
   .disablePlugins(sbtassembly.AssemblyPlugin)
   .enablePlugins(AsciidoctorPlugin, SiteScaladocPlugin)
-  .aggregate(library, demo)
+  .aggregate(core, demo)
   .settings(
     commonSettings,
     noPublishing,
