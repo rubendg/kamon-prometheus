@@ -49,7 +49,7 @@ class TextFormatSpec extends WordSpec with GeneratorDrivenPropertyChecks with Ma
     }
 
     "round-trip arbitrary snapshots" in {
-      forAll(PrometheusGen.snapshot → "snapshot", maxSize(25)) { (snapshot: Seq[MetricFamily]) ⇒
+      forAll(PrometheusGen.snapshot → "snapshot", sizeRange(25)) { (snapshot: Seq[MetricFamily]) ⇒
         TextFormat.parse(TextFormat.format(snapshot)) shouldBe snapshot
       }
     }

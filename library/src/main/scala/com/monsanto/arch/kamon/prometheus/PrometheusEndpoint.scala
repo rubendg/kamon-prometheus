@@ -9,18 +9,19 @@ import com.monsanto.arch.kamon.prometheus.metric.{MetricFamily, ProtoBufFormat, 
 import kamon.metric.SubscriptionsDispatcher.TickMetricSnapshot
 import spray.http._
 import spray.httpx.marshalling.ToResponseMarshaller
-import spray.routing.Route
-import spray.routing.Directives
+import spray.routing.{Directives, Route}
 
 /** Manages the Spray endpoint that Prometheus can use to scrape metrics.
   *
   * @author Daniel Solano Gómez
   */
-class PrometheusEndpoint(settings: PrometheusSettings, snapshot: AtomicReference[Seq[MetricFamily]])(implicit val actorRefFactory: ActorRefFactory) {
+class PrometheusEndpoint(settings: PrometheusSettings)(implicit val actorRefFactory: ActorRefFactory) {
   import PrometheusEndpoint.{ProtoBufContentType, TextContentType}
 
   /** Converts snapshots from Kamon’s native type to the one used by this extension. */
   private val snapshotConverter = new SnapshotConverter(settings)
+  /** Mutable cell with the latest snapshot. */
+  private[prometheus] val snapshot = new AtomicReference[Seq[MetricFamily]]
 
   /** Marshals a snapshot to the text exposition format. */
   private val textMarshaller: ToResponseMarshaller[Seq[MetricFamily]] =
@@ -45,10 +46,8 @@ class PrometheusEndpoint(settings: PrometheusSettings, snapshot: AtomicReference
       compressResponseIfRequested() {
         dynamic {
           Option(snapshot.get) match {
-            case Some(s) =>
-              complete(s)
-            case None =>
-              complete(StatusCodes.NoContent)
+            case Some(s) => complete(s)
+            case None => complete(StatusCodes.NoContent)
           }
         }
       }

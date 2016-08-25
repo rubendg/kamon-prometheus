@@ -43,7 +43,7 @@ class ProtoBufFormatSpec extends WordSpec with Matchers with GeneratorDrivenProp
     }
 
     "round-trip arbitrary snapshots" in {
-      forAll(PrometheusGen.snapshot → "snapshot", maxSize(30)) { (snapshot: Seq[MetricFamily]) ⇒
+      forAll(PrometheusGen.snapshot → "snapshot", sizeRange(30)) { (snapshot: Seq[MetricFamily]) ⇒
         ProtoBufFormat.parse(ProtoBufFormat.format(snapshot)) shouldBe snapshot
       }
     }

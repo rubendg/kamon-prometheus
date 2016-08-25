@@ -9,11 +9,13 @@ class PrometheusListener(endpoint: PrometheusEndpoint) extends Actor {
   private val log = Logging(context.system, this)
 
   override def receive = {
-    case tick: TickMetricSnapshot =>
+    case tick: TickMetricSnapshot => {
       log.debug(s"Got a tick: $tick")
       endpoint.updateSnapShot(tick)
-    case x =>
+    }
+    case x => {
       log.warning(s"Got an $x")
+    }
   }
 }
 object PrometheusListener {

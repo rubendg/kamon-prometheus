@@ -1,21 +1,20 @@
 import java.util.Date
 import sbtprotobuf.ProtobufPlugin
 
-val akkaVersion = "2.4.6"
+val akkaVersion = "2.4.9"
 val sprayVersion = "1.3.3"
 val kamonVersion = "0.6.2"
-scalaVersion in ThisBuild := "2.11.7"
 
 lazy val commonSettings = Seq(
   homepage := Some(url("https://monsantoco.github.io/kamon-prometheus")),
   organization := "com.monsanto.arch",
   organizationHomepage := Some(url("http://engineering.monsanto.org")),
   licenses := Seq("BSD New" → url("http://opensource.org/licenses/BSD-3-Clause")),
-  scalaVersion := scalaVersion.value,
+  scalaVersion := "2.11.8",
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
-    "-encoding", "utf8"
+    "-encoding", "UTF-8"
   ),
   resolvers += Resolver.jcenterRepo,
   apiMappingsScala ++= Map(
@@ -53,12 +52,19 @@ val noPublishing = Seq(
   publishArtifact := false
 )
 
+lazy val BufferedConfigTest = config("buffered-config-test").extend(Test)
+lazy val InvalidConfigTest = config("invalid-config-test").extend(Test)
+val testConfigs = "test, buffered-config-test, invalid-config-test"
+
 lazy val library = (project in file("library"))
+  .configs(BufferedConfigTest, InvalidConfigTest)
   .disablePlugins(sbtassembly.AssemblyPlugin)
-  .settings(commonSettings: _*)
-  .settings(bintrayPublishing: _*)
-  .settings(ProtobufPlugin.protobufSettings: _*)
   .settings(
+    commonSettings,
+    bintrayPublishing,
+    ProtobufPlugin.protobufSettings,
+    inConfig(BufferedConfigTest)(Defaults.testSettings),
+    inConfig(InvalidConfigTest)(Defaults.testSettings),
     name := "kamon-prometheus",
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
@@ -67,15 +73,17 @@ lazy val library = (project in file("library"))
       "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
       "com.typesafe"            % "config"                   % "1.3.0",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4" % "provided",
-      //"org.slf4j" % "slf4j-simple" % "1.7.21",
       // -- testing --
-      "org.scalatest"     %% "scalatest"     % "2.2.5"      % "test",
-      "com.typesafe.akka" %% "akka-testkit"  % akkaVersion  % "test",
-      "io.spray"          %% "spray-testkit" % sprayVersion % "test",
-      "org.scalacheck"    %% "scalacheck"    % "1.12.5"     % "test",
-      "io.kamon"          %% "kamon-akka"    % kamonVersion % "test"
+      "ch.qos.logback"     % "logback-classic" % "1.1.7"    % testConfigs,
+      "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion  % testConfigs,
+      "com.typesafe.akka" %% "akka-testkit"    % akkaVersion  % "test",
+      "org.scalatest"     %% "scalatest"       % "3.0.0"      % testConfigs,
+      "io.kamon"          %% "kamon-akka"      % kamonVersion % "test",
+      "io.spray"          %% "spray-testkit"   % sprayVersion % "test",
+      "org.scalacheck"    %% "scalacheck"      % "1.13.2"     % "test"
     ),
     dependencyOverrides ++= Set(
+      "com.typesafe.akka"      %% "akka-actor"    % akkaVersion,
       "org.scala-lang"          % "scala-library" % scalaVersion.value,
       "org.scala-lang"          % "scala-reflect" % scalaVersion.value,
       "org.scala-lang.modules" %% "scala-xml"     % "1.0.4"
@@ -91,17 +99,17 @@ lazy val library = (project in file("library"))
 lazy val demo = (project in file("demo"))
   .dependsOn(library)
   .enablePlugins(DockerPlugin)
-  .settings(commonSettings: _*)
-  .settings(aspectjSettings: _*)
-  .settings(noPublishing: _*)
   .settings(
+    commonSettings,
+    aspectjSettings,
+    noPublishing,
     name := "kamon-prometheus-demo",
     description := "Docker image containing a demonstration of kamon-prometheus in action.",
     libraryDependencies ++= Seq(
       "io.kamon"          %% "kamon-spray"          % kamonVersion,
       "io.kamon"          %% "kamon-system-metrics" % kamonVersion,
       "io.spray"          %% "spray-can"            % sprayVersion,
-      "com.monsanto.arch" %% "spray-kamon-metrics"  % "0.1.2"
+      "com.monsanto.arch" %% "spray-kamon-metrics"  % "0.1.3"
     ),
     fork in run := true,
     javaOptions in run <++= AspectjKeys.weaverOptions in Aspectj,
@@ -176,15 +184,13 @@ lazy val ghPagesSettings =
     git.remoteRepo := "git@github.com:MonsantoCo/kamon-prometheus.git"
   )
 
-lazy val siteSettings =
-  site.settings ++
-  site.addMappingsToSiteDir(mappings in packageDoc in Compile in library, "api/snapshot") ++
-  site.asciidoctorSupport()
-
 lazy val `kamon-prometheus` = (project in file("."))
   .disablePlugins(sbtassembly.AssemblyPlugin)
+  .enablePlugins(AsciidoctorPlugin, SiteScaladocPlugin)
   .aggregate(library, demo)
-  .settings(commonSettings: _*)
-  .settings(noPublishing: _*)
-  .settings(siteSettings: _*)
-  .settings(ghPagesSettings: _*)
+  .settings(
+    commonSettings,
+    noPublishing,
+    ghPagesSettings,
+    siteSubdirName in SiteScaladoc := "api/snapshot"
+  )
