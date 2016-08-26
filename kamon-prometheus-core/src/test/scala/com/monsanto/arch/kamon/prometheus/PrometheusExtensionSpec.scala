@@ -8,7 +8,7 @@ import kamon.metric.SingleInstrumentEntityRecorder
 import kamon.util.MilliTimestamp
 import org.scalactic.Uniformity
 import org.scalatest.concurrent.Eventually.eventually
-import org.scalatest.{Matchers, Outcome, fixture}
+import org.scalatest._
 import spray.http.HttpHeaders.{Accept, `Accept-Encoding`}
 import spray.http.{HttpEncodings, HttpResponse, MediaType, StatusCodes}
 import spray.httpx.encoding.Gzip
@@ -24,7 +24,7 @@ import scala.concurrent.duration.DurationInt
   *
   * @author Daniel Solano Gómez
   */
-class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest with Matchers {
+class PrometheusExtensionSpec extends WordSpec with ScalatestRouteTest with Matchers {
   /** Unmarshaller from the text format. */
   val textUnmarshaller =
     Unmarshaller.delegate[String, Seq[MetricFamily]](PrometheusEndpoint.TextMediaType)(TextFormat.parse)
@@ -43,30 +43,18 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
   }
 
-  override type FixtureParam = PrometheusExtension
-
-  /** Starts and stops Kamon around each test. */
-  override def withFixture(test: OneArgTest): Outcome = {
-    Kamon.start()
-    val system = ActorSystem()
-    val extension = Prometheus(system)
-    try {
-      withFixture(test.toNoArgTest(extension))
-    } finally {
-      Await.result(system.terminate(), 1.second)
-    }
-  }
+  val extension = Prometheus.awaitKamonInstance()
 
   "The Prometheus extension" should {
-    "be available from Kamon" in { extension ⇒
+    "be available from Kamon" in {
       extension should not be null
     }
 
-    "provide a spray endpoint" in { extension ⇒
+    "provide a spray endpoint" in {
       extension.route should not be null
     }
 
-    "not buffer when the refresh interval is the same as the tick interval" in { extension ⇒
+    "not buffer when the refresh interval is the same as the tick interval" in {
       extension.isBuffered shouldBe false
       extension.listener shouldBe theSameInstanceAs(extension.buffer)
     }
@@ -74,8 +62,8 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
 
   "The Prometheus extension endpoint" when {
     "it has no snapshots" should {
-      "returns an empty response" in { kamonPrometheus ⇒
-        Get() ~> kamonPrometheus.route ~> check {
+      "returns an empty response" in {
+        Get() ~> extension.route ~> check {
           handled shouldBe true
           status shouldBe StatusCodes.NoContent
         }
@@ -83,37 +71,37 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
 
     "doing a plain-text request" when {
-      def doGet(extension: PrometheusExtension) = Get() ~> extension.route
+      def doGet() = Get() ~> extension.route
 
       "it has content" should {
-        "handle GET requests" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "handle GET requests" in withData {
+          doGet() ~> check {
             handled shouldBe true
             status shouldBe StatusCodes.OK
           }
         }
 
-        "use the correct encoding" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct encoding" in withData {
+          doGet() ~> check {
             definedCharset shouldBe defined
             charset.value shouldBe "UTF-8"
           }
         }
 
-        "use the correct media type" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct media type" in withData {
+          doGet() ~> check {
             mediaType shouldBe MediaType.custom("text", "plain", parameters = Map("version" -> "0.0.4"))
           }
         }
 
-        "is not compressed" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "is not compressed" in withData {
+          doGet() ~> check {
             response.encoding shouldBe HttpEncodings.identity
           }
         }
 
-        "have the correct content" in withData { (extension, snapshot) ⇒
-          doGet(extension) ~> check {
+        "have the correct content" in withData { snapshot: Seq[MetricFamily] ⇒
+          doGet() ~> check {
             val response = responseAs[Seq[MetricFamily]]
             (response should contain theSameElementsAs snapshot) (after being normalised)
           }
@@ -122,38 +110,38 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
 
     "doing a plain-text request accepting gzip compression" when {
-      def doGet(extension: PrometheusExtension) =
+      def doGet(): RouteResult =
         Get() ~> `Accept-Encoding`(HttpEncodings.gzip) ~> extension.route
 
       "it has content" should {
-        "handle GET requests" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "handle GET requests" in withData {
+          doGet() ~> check {
             handled shouldBe true
             status shouldBe StatusCodes.OK
           }
         }
 
-        "use the correct encoding" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct encoding" in withData {
+          doGet() ~> check {
             definedCharset shouldBe defined
             charset.value shouldBe "UTF-8"
           }
         }
 
-        "use the correct media type" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct media type" in withData {
+          doGet() ~> check {
             mediaType shouldBe MediaType.custom("text", "plain", parameters = Map("version" -> "0.0.4"))
           }
         }
 
-        "is compressed" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "is compressed" in withData {
+          doGet() ~> check {
             response.encoding shouldBe HttpEncodings.gzip
           }
         }
 
-        "have the correct content" in withData { (extension, snapshot) ⇒
-          doGet(extension) ~> check {
+        "have the correct content" in withData { snapshot: Seq[MetricFamily] ⇒
+          doGet() ~> check {
             val response = responseAs[Seq[MetricFamily]]
             (response should contain theSameElementsAs snapshot) (after being normalised)
           }
@@ -162,31 +150,31 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
 
     "doing a protocol buffer request" when {
-      def doGet(extension: PrometheusExtension) =
+      def doGet(): RouteResult =
         Get() ~> Accept(PrometheusEndpoint.ProtoBufMediaType) ~> extension.route
 
       "it has content" should {
-        "handle GET requests" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "handle GET requests" in withData {
+          doGet() ~> check {
             handled shouldBe true
             status shouldBe StatusCodes.OK
           }
         }
 
-        "use the correct media type" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct media type" in withData {
+          doGet() ~> check {
             mediaType shouldBe PrometheusEndpoint.ProtoBufMediaType
           }
         }
 
-        "is not compressed" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "is not compressed" in withData {
+          doGet() ~> check {
             response.encoding shouldBe HttpEncodings.identity
           }
         }
 
-        "have the correct content" in withData { (extension, snapshot) ⇒
-          doGet(extension) ~> check {
+        "have the correct content" in withData { snapshot: Seq[MetricFamily] ⇒
+          doGet() ~> check {
             val response = responseAs[Seq[MetricFamily]]
             (response should contain theSameElementsAs snapshot) (after being normalised)
           }
@@ -195,34 +183,34 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
 
     "doing a protocol buffer request accepting gzip compression" when {
-      def doGet(extension: PrometheusExtension) =
+      def doGet(): RouteResult =
         Get() ~>
         `Accept-Encoding`(HttpEncodings.gzip) ~>
         Accept(PrometheusEndpoint.ProtoBufMediaType) ~>
         extension.route
 
       "it has content" should {
-        "handle GET requests" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "handle GET requests" in withData {
+          doGet() ~> check {
             handled shouldBe true
             status shouldBe StatusCodes.OK
           }
         }
 
-        "use the correct media type" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "use the correct media type" in withData {
+          doGet() ~> check {
             mediaType shouldBe PrometheusEndpoint.ProtoBufMediaType
           }
         }
 
-        "is not compressed" in withData { (extension, _) ⇒
-          doGet(extension) ~> check {
+        "is not compressed" in withData {
+          doGet() ~> check {
             response.encoding shouldBe HttpEncodings.gzip
           }
         }
 
-        "have the correct content" in withData { (extension, snapshot) ⇒
-          doGet(extension) ~> check {
+        "have the correct content" in withData { snapshot: Seq[MetricFamily] ⇒
+          doGet() ~> check {
             val response = responseAs[Seq[MetricFamily]]
             (response should contain theSameElementsAs snapshot) (after being normalised)
           }
@@ -268,7 +256,7 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
     }
   }
 
-  def withData[T](test: (PrometheusExtension, Seq[MetricFamily]) ⇒ T): PrometheusExtension ⇒ T = { extension ⇒
+  def withData[T](test: Seq[MetricFamily] ⇒ T): T = {
     try {
       import SnapshotConverter.{KamonCategoryLabel, KamonNameLabel}
       val ts = MilliTimestamp.now
@@ -324,8 +312,14 @@ class PrometheusExtensionSpec extends fixture.WordSpec with ScalatestRouteTest w
       KamonTestKit.flushSubscriptions()
       eventually {
         Option(extension.endpoint.snapshot.get()) shouldBe defined
-        test(extension, snapshot)
       }
+      test(snapshot)
     } finally KamonTestKit.clearEntities()
+  }
+
+  def withData[T](test: ⇒ T): T = {
+    withData { (_) ⇒
+      test
+    }
   }
 }
