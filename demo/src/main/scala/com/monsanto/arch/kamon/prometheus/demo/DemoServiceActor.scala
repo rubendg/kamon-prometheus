@@ -1,6 +1,6 @@
 package com.monsanto.arch.kamon.prometheus.demo
 
-import com.monsanto.arch.kamon.prometheus.Prometheus
+import com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint
 import com.monsanto.arch.kamon.spray.routing.TracingHttpServiceActor
 import kamon.Kamon
 
@@ -91,7 +91,7 @@ class DemoServiceActor extends TracingHttpServiceActor {
   /** This directive creates the metrics endpoint at `/metrics` and names all traces which end up here ‘metrics’. */
   val metricsRoute =
     path("metrics") {
-      Prometheus.awaitKamonInstance().route
+      SprayEndpoint(context.system).route
     }
 }
 

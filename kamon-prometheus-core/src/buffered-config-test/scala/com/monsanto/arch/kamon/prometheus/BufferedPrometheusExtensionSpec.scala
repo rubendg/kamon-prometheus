@@ -7,11 +7,17 @@ import org.scalatest.{Matchers, WordSpec}
   * @author Daniel Solano Gómez
   */
 class BufferedPrometheusExtensionSpec extends WordSpec with Matchers {
-  "The Prometheus extension" should {
-    "buffer when the refresh interval is longer than the tick interval" in {
-      val extension = Prometheus.awaitKamonInstance()
-      extension.isBuffered shouldBe true
-      extension.listener should not be theSameInstanceAs(extension.buffer)
+  val extension = Prometheus.awaitKamonInstance()
+
+  "The Prometheus extension" when {
+    "the refresh interval is longer than the tick interval" should {
+      "report that it is buffered" in {
+        extension.isBuffered shouldBe true
+      }
+
+      "have a distinct buffer actor from the main ref" in {
+        extension.ref should not be theSameInstanceAs(extension.buffer)
+      }
     }
   }
 }

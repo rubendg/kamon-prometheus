@@ -69,12 +69,12 @@ lazy val core = Project("kamon-prometheus-core", file("kamon-prometheus-core"))
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
       "io.kamon"               %% "kamon-core"               % kamonVersion,
-      "io.spray"               %% "spray-routing"            % sprayVersion,
+      "io.spray"               %% "spray-routing"            % sprayVersion % "provided",
       "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
       "com.typesafe"            % "config"                   % "1.3.0",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4" % "provided",
       // -- testing --
-      "ch.qos.logback"     % "logback-classic" % "1.1.7"    % testConfigs,
+      "ch.qos.logback"     % "logback-classic" % "1.1.7"      % testConfigs,
       "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion  % testConfigs,
       "com.typesafe.akka" %% "akka-testkit"    % akkaVersion  % "test",
       "org.scalatest"     %% "scalatest"       % "3.0.0"      % testConfigs,

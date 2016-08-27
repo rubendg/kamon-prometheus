@@ -1,27 +1,29 @@
-package com.monsanto.arch.kamon.prometheus
+package com.monsanto.arch.kamon.prometheus.spray
 
 import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
 
-import akka.actor.ActorRefFactory
-import com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter
+import akka.actor.ActorDSL._
+import akka.actor.{ActorRefFactory, ExtendedActorSystem}
+import akka.event.Logging
 import com.monsanto.arch.kamon.prometheus.metric.{MetricFamily, ProtoBufFormat, TextFormat}
-import kamon.metric.SubscriptionsDispatcher.TickMetricSnapshot
+import com.monsanto.arch.kamon.prometheus.spray.PrometheusEndpoint.{ProtoBufContentType, TextContentType}
+import com.monsanto.arch.kamon.prometheus.{Prometheus, PrometheusExtension}
 import spray.http._
 import spray.httpx.marshalling.ToResponseMarshaller
 import spray.routing.{Directives, Route}
+
+import scala.util.{Failure, Success}
 
 /** Manages the Spray endpoint that Prometheus can use to scrape metrics.
   *
   * @author Daniel Solano Gómez
   */
-class PrometheusEndpoint(settings: PrometheusSettings)(implicit val actorRefFactory: ActorRefFactory) {
-  import PrometheusEndpoint.{ProtoBufContentType, TextContentType}
+private[spray] class PrometheusEndpoint(val system: ExtendedActorSystem) extends SprayEndpoint {
+  implicit val arf: ActorRefFactory = system
 
-  /** Converts snapshots from Kamon’s native type to the one used by this extension. */
-  private val snapshotConverter = new SnapshotConverter(settings)
   /** Mutable cell with the latest snapshot. */
-  private[prometheus] val snapshot = new AtomicReference[Seq[MetricFamily]]
+  private[spray] val snapshot = new AtomicReference[Seq[MetricFamily]]
 
   /** Marshals a snapshot to the text exposition format. */
   private val textMarshaller: ToResponseMarshaller[Seq[MetricFamily]] =
@@ -46,18 +48,30 @@ class PrometheusEndpoint(settings: PrometheusSettings)(implicit val actorRefFact
       compressResponseIfRequested() {
         dynamic {
           Option(snapshot.get) match {
-            case Some(s) => complete(s)
-            case None => complete(StatusCodes.NoContent)
+            case Some(s) ⇒ complete(s)
+            case None    ⇒ complete(StatusCodes.NoContent)
           }
         }
       }
     }
   }
 
-  /** Updates the endpoint's current snapshot atomically. */
-  def updateSnapShot(newSnapshot: TickMetricSnapshot): Unit = {
-    snapshot.set(snapshotConverter(newSnapshot))
-  }
+  private val updater = actor(new Act {
+    become {
+      case PrometheusExtension.Snapshot(s) ⇒ snapshot.set(s)
+    }
+  })
+
+  Prometheus.kamonInstance.onComplete { result ⇒
+    val log = Logging(system, classOf[SprayEndpoint])
+    result match {
+      case Success(ext) ⇒
+        log.debug("SprayEndpoint is subscribing to Kamon Prometheus updates")
+        ext.ref.tell(PrometheusExtension.Subscribe, updater)
+      case Failure(t) ⇒
+        log.error(t, "Kamon Prometheus module failed to load, SprayEndpoint will never serve data")
+    }
+  }(system.dispatcher)
 }
 
 private object PrometheusEndpoint {
