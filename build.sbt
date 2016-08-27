@@ -56,7 +56,7 @@ lazy val BufferedConfigTest = config("buffered-config-test").extend(Test)
 lazy val InvalidConfigTest = config("invalid-config-test").extend(Test)
 val testConfigs = "test, buffered-config-test, invalid-config-test"
 
-lazy val core = Project("kamon-prometheus-core", file("kamon-prometheus-core"))
+lazy val library = Project("kamon-prometheus", file("library"))
   .configs(BufferedConfigTest, InvalidConfigTest)
   .disablePlugins(sbtassembly.AssemblyPlugin)
   .settings(
@@ -97,7 +97,7 @@ lazy val core = Project("kamon-prometheus-core", file("kamon-prometheus-core"))
   )
 
 lazy val demo = (project in file("demo"))
-  .dependsOn(core)
+  .dependsOn(library)
   .enablePlugins(DockerPlugin)
   .settings(
     commonSettings,
@@ -187,7 +187,7 @@ lazy val ghPagesSettings =
 lazy val `kamon-prometheus` = (project in file("."))
   .disablePlugins(sbtassembly.AssemblyPlugin)
   .enablePlugins(AsciidoctorPlugin, SiteScaladocPlugin)
-  .aggregate(core, demo)
+  .aggregate(library, demo)
   .settings(
     commonSettings,
     noPublishing,
