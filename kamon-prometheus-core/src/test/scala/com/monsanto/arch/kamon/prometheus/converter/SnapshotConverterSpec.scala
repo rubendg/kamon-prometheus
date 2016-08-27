@@ -7,7 +7,7 @@ import com.monsanto.arch.kamon.prometheus.KamonTestKit._
 import com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter.{KamonCategoryLabel, KamonNameLabel}
 import com.monsanto.arch.kamon.prometheus.metric.PrometheusType.Counter
 import com.monsanto.arch.kamon.prometheus.metric._
-import com.monsanto.arch.kamon.prometheus.{KamonTestKit, PrometheusGen, PrometheusSettings}
+import com.monsanto.arch.kamon.prometheus.{PrometheusGen, PrometheusSettings}
 import com.typesafe.config.ConfigFactory
 import kamon.Kamon
 import kamon.akka.{ActorMetrics, RouterMetrics}
@@ -16,13 +16,15 @@ import kamon.metric._
 import kamon.metric.instrument.{InstrumentFactory, Memory, Time, UnitOfMeasurement}
 import kamon.util.executors.{ForkJoinPoolMetrics, ThreadPoolExecutorMetrics}
 import org.scalacheck.Gen
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.{LoneElement, Matchers, Outcome, WordSpec}
+import org.scalatest.LoneElement._
+import org.scalatest.Matchers._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks._
+import org.scalatest.{Outcome, WordSpec}
 
 import scala.concurrent.forkjoin.ForkJoinPool
 
 /** Tests for the conversion of Kamon TickMetricSnapshot instances into our own MetricFamily instances. */
-class SnapshotConverterSpec extends WordSpec with Matchers with GeneratorDrivenPropertyChecks with LoneElement {
+class SnapshotConverterSpec extends WordSpec {
   def handle = afterWord("handle")
 
   def _have = afterWord("have")
