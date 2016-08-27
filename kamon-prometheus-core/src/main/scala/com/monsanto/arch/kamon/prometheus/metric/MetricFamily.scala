@@ -17,9 +17,9 @@ case class MetricFamily(name: String, prometheusType: PrometheusType, help: Opti
   def withHelp(newHelp: String) = MetricFamily(name, prometheusType, Some(newHelp), metrics)
 }
 
-object MetricFamily {
+private[prometheus] object MetricFamily {
   /** The pattern for valid Prometheus metric names. */
-  val MetricNamePattern = Pattern.compile("^[a-zA-Z_:][a-zA-Z0-9_:]*$")
+  private val MetricNamePattern = Pattern.compile("^[a-zA-Z_:][a-zA-Z0-9_:]*$")
 
   /** Verifies whether a metric family name is valid. */
   def isValidMetricFamilyName(name: String): Boolean = MetricNamePattern.matcher(name).matches()

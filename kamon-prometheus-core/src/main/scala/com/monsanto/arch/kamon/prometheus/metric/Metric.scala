@@ -22,7 +22,7 @@ case class Metric(value: MetricValue, timestamp: MilliTimestamp, labels: Map[Str
   }
 }
 
-object Metric {
+private[prometheus] object Metric {
   /** Verifies that a label name is generally valid. */
   private val LabelNamePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 

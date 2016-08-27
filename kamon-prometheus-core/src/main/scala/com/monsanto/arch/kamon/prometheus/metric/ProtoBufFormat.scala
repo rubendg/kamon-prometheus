@@ -30,7 +30,7 @@ object ProtoBufFormat extends SerialisationFormat[Array[Byte]] {
   /** Constructs a Kamon/Prometheus snapshot from an input stream that contains a snapshot serialised with the
     * Prometheus protocol buffer binary format.
     */
-  def readFrom(in: InputStream): Seq[MetricFamily] = {
+  private[metric] def readFrom(in: InputStream): Seq[MetricFamily] = {
     import scala.collection.JavaConversions.asScalaBuffer
 
     val builder = Seq.newBuilder[MetricFamily]
@@ -67,7 +67,7 @@ object ProtoBufFormat extends SerialisationFormat[Array[Byte]] {
   }
 
   /** Writes the given Kamon/Prometheus snapshot to the output stream using the Prometheus protocol buffer format. */
-  def writeTo(snapshot: Seq[MetricFamily], out: OutputStream) {
+  private[metric] def writeTo(snapshot: Seq[MetricFamily], out: OutputStream) {
     snapshot.foreach { family ⇒
       val builder = Metrics.MetricFamily.newBuilder()
         .setName(family.name)

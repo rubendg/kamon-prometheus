@@ -53,22 +53,22 @@ object TextFormat extends SerialisationFormat[String] {
   }
 
   /** Escapes all disallowed characters from help strings.  In particular, these are backslashes and new lines. */
-  def escapeHelp(help: String) = {
+  private[metric] def escapeHelp(help: String) = {
     help.replace("\\", "\\\\").replace("\n", "\\n")
   }
 
   /** Unescapes all allowed escape sequences from help strings. */
-  def unescapeHelp(escapedHelp: String) = unescape(escapedHelp, "help string", escapeDoubleQuotes = false)
+  private[metric] def unescapeHelp(escapedHelp: String) = unescape(escapedHelp, "help string", escapeDoubleQuotes = false)
 
   /** Escapes all disallowed characters from label values.  In particular, these are backslashes, double quotes, and
     * new lines.
     */
-  def escapeLabelValue(value: String) = {
+  private[metric] def escapeLabelValue(value: String) = {
     value.replace( """\""", """\\""").replace("\n", """\n""").replace("\"", """\"""")
   }
 
   /** Unescapes backslashes, double quotes, and new lines from label values. */
-  def unescapeLabelValue(escapedValue: String) = unescape(escapedValue, "label value", escapeDoubleQuotes = true)
+  private[metric] def unescapeLabelValue(escapedValue: String) = unescape(escapedValue, "label value", escapeDoubleQuotes = true)
 
   /** Somewhat general unescape routine.  In particular, this is useful so that input text like '\\n' does not get
     * unintentionally unescaped.
@@ -99,7 +99,7 @@ object TextFormat extends SerialisationFormat[String] {
   }
 
   /** Formats a metric value using Prometheus’ notation. */
-  def formatValue(d: Double): String = d match {
+  private[metric] def formatValue(d: Double): String = d match {
     case Double.PositiveInfinity ⇒ "+Inf"
     case Double.NegativeInfinity ⇒ "-Inf"
     case x if x.isNaN ⇒ "Nan"
@@ -107,7 +107,7 @@ object TextFormat extends SerialisationFormat[String] {
   }
 
   /** Parses a metric value that has been written out using Prometheus’ notation. */
-  def parseValue(s: String): Double = s match {
+  private def parseValue(s: String): Double = s match {
     case "+Inf" ⇒ Double.PositiveInfinity
     case "-Inf" ⇒ Double.NegativeInfinity
     case "Nan" ⇒ Double.NaN

@@ -7,7 +7,7 @@ import java.util.regex.Pattern
   *
   * @author Daniel Solano Gómez
   */
-object Mungers {
+private[converter] object Mungers {
   /** Creates a munging function from a regular expression pattern. */
   private def makeMunger(pattern: Pattern)(str: String) = pattern.matcher(str).replaceAll("_")
 
