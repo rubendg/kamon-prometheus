@@ -56,7 +56,7 @@ lazy val BufferedConfigTest = config("buffered-config-test").extend(Test)
 lazy val InvalidConfigTest = config("invalid-config-test").extend(Test)
 val testConfigs = "test, buffered-config-test, invalid-config-test"
 
-lazy val library = Project("kamon-prometheus", file("library"))
+lazy val library = (project in file("library"))
   .configs(BufferedConfigTest, InvalidConfigTest)
   .disablePlugins(sbtassembly.AssemblyPlugin)
   .settings(
@@ -65,22 +65,24 @@ lazy val library = Project("kamon-prometheus", file("library"))
     ProtobufPlugin.protobufSettings,
     inConfig(BufferedConfigTest)(Defaults.testSettings),
     inConfig(InvalidConfigTest)(Defaults.testSettings),
-    name := "kamon-prometheus-core",
+    name := "kamon-prometheus",
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
       "io.kamon"               %% "kamon-core"               % kamonVersion,
       "io.spray"               %% "spray-routing"            % sprayVersion % "provided",
       "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
+      "com.typesafe.akka"      %% "akka-http-experimental"   % akkaVersion  % "provided",
       "com.typesafe"            % "config"                   % "1.3.0",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4" % "provided",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"      % "provided",
       // -- testing --
-      "ch.qos.logback"     % "logback-classic" % "1.1.7"      % testConfigs,
-      "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion  % testConfigs,
-      "com.typesafe.akka" %% "akka-testkit"    % akkaVersion  % "test",
-      "org.scalatest"     %% "scalatest"       % "3.0.0"      % testConfigs,
-      "io.kamon"          %% "kamon-akka"      % kamonVersion % "test",
-      "io.spray"          %% "spray-testkit"   % sprayVersion % "test",
-      "org.scalacheck"    %% "scalacheck"      % "1.13.2"     % "test"
+      "ch.qos.logback"     % "logback-classic"   % "1.1.7"      % testConfigs,
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion  % "test",
+      "com.typesafe.akka" %% "akka-slf4j"        % akkaVersion  % testConfigs,
+      "com.typesafe.akka" %% "akka-testkit"      % akkaVersion  % "test",
+      "org.scalatest"     %% "scalatest"         % "3.0.0"      % testConfigs,
+      "io.kamon"          %% "kamon-akka"        % kamonVersion % "test",
+      "io.spray"          %% "spray-testkit"     % sprayVersion % "test",
+      "org.scalacheck"    %% "scalacheck"        % "1.13.2"     % "test"
     ),
     dependencyOverrides ++= Set(
       "com.typesafe.akka"      %% "akka-actor"    % akkaVersion,

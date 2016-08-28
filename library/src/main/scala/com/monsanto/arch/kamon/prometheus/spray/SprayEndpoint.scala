@@ -31,8 +31,6 @@ import spray.routing.Route
   *   }
   * }}}
   *
-  *
-  *
   * '''NOTE:'''  When you instantiate the extension, it will asynchronously
   * register itself with the Kamon Prometheus extension and start receiving
   * snapshots.  '''However, if Kamon fails to instantiate the Prometheus
