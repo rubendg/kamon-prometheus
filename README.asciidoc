@@ -53,8 +53,8 @@ resolvers += Resolver.jcenterRepo
 
 Kamon’s module loader should automatically detect the presence of
 _kamon-prometheus_ and start it.  However, in order to be useful, you will need
-to <<Usage,include the extension’s Spray route somewhere in your service>> so
-that Prometheus can invoke it.
+to <<Usage,include the extension’s Spray or Akka HTTP routes somewhere in your
+service>> so that Prometheus can invoke it.
 
 
 Dependencies
