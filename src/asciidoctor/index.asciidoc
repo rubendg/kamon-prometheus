@@ -18,6 +18,7 @@ https://github.com/MonsantoCo/kamon-prometheus/blob/master/README.asciidoc[READM
 === API documentation
 
 * link:api/snapshot[snapshot]
+* link:api/0.2.0[0.2.0]
 * link:api/0.1.2[0.1.2]
 
 
