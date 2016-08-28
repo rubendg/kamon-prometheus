@@ -1,0 +1,261 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>converter - com.monsanto.arch.kamon.prometheus.converter</title>
+          <meta name="description" content="converter - com.monsanto.arch.kamon.prometheus.converter" />
+          <meta name="keywords" content="converter com.monsanto.arch.kamon.prometheus.converter" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../index.html';
+            var hash = 'com.monsanto.arch.kamon.prometheus.converter.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../../package.html" class="extype" name="com">com</a>.<a href="../../../../package.html" class="extype" name="com.monsanto">monsanto</a>.<a href="../../../package.html" class="extype" name="com.monsanto.arch">arch</a>.<a href="../../package.html" class="extype" name="com.monsanto.arch.kamon">kamon</a>.<a href="../package.html" class="extype" name="com.monsanto.arch.kamon.prometheus">prometheus</a></p>
+        <h1>converter</h1><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">converter</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.converter.DefaultPostprocessor" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DefaultPostprocessorextendsPostprocessor"></a>
+      <a id="DefaultPostprocessor:DefaultPostprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DefaultPostprocessor.html"><span class="name">DefaultPostprocessor</span></a><span class="result"> extends <a href="Postprocessor.html" class="extype" name="com.monsanto.arch.kamon.prometheus.converter.Postprocessor">Postprocessor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@DefaultPostprocessorextendsPostprocessor" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The default post-processor which adds some help text to certain predefined metric families.</p><div class="fullcomment"><div class="comment cmt"><p>The default post-processor which adds some help text to certain predefined metric families.  Currently, this
+supports <code>kamon-akka</code>’s actor and dispatcher metrics.
+</p></div></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.DefaultPreprocessor" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DefaultPreprocessorextendsPreprocessor"></a>
+      <a id="DefaultPreprocessor:DefaultPreprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DefaultPreprocessor.html"><span class="name">DefaultPreprocessor</span></a><span class="result"> extends <a href="Preprocessor.html" class="extype" name="com.monsanto.arch.kamon.prometheus.converter.Preprocessor">Preprocessor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@DefaultPreprocessorextendsPreprocessor" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The default preprocessor makes a number of modifications to make querying some Kamon-generated metrics nicer.</p><div class="fullcomment"><div class="comment cmt"><p>The default preprocessor makes a number of modifications to make querying some Kamon-generated metrics nicer.</p><p>In particular, it makes the following changes:</p><ol class="decimal"><li>Adds an <code>actor_name</code> label to Akka actor metrics</li><li>Adds a <code>dispatcher_name</code> label to Akka dispatcher metrics</li><li>By default, both types of Akka dispatchers are grouped into the same
+    category and are differentiated by a tag.  This is potentially
+    confusing as they both have <code>active-threads</code> instruments with slightly
+    different semantics.  This preprocessor splits them into two different
+    metric families by modifying the category name.
+</li></ol></div></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.MetricSnapshot" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MetricSnapshotextendsProductwithSerializable"></a>
+      <a id="MetricSnapshot:MetricSnapshot"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MetricSnapshot.html"><span class="name">MetricSnapshot</span></a><span class="params">(<span name="category">category: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tags">tags: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="value">value: <span class="extype" name="kamon.metric.EntitySnapshot">EntitySnapshot</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@MetricSnapshotextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Contains all of the information from an entity snapshot from Kamon.</p><div class="fullcomment"><div class="comment cmt"><p>Contains all of the information from an entity snapshot from Kamon.
+</p></div><dl class="paramcmts block"><dt class="param">category</dt><dd class="cmt"><p>the category name from Kamon</p></dd><dt class="param">name</dt><dd class="cmt"><p>the metric name from  Kamon</p></dd><dt class="param">tags</dt><dd class="cmt"><p>all of the tags from Kamon</p></dd><dt class="param">value</dt><dd class="cmt"><p>the snapshot value of the entity from Kamon</p></dd></dl></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.Postprocessor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PostprocessorextendsAnyRef"></a>
+      <a id="Postprocessor:Postprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Postprocessor.html"><span class="name">Postprocessor</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@PostprocessorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Once a sequence of metric families has been generated by the snapshot converter, each family is passed through a
+postprocessor that can perform last-minute changes to the metrics before they are serialised.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.Preprocessor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PreprocessorextendsAnyRef"></a>
+      <a id="Preprocessor:Preprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Preprocessor.html"><span class="name">Preprocessor</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@PreprocessorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Allows preprocessing of metrics before they are sorted by category and converted to kamon-prometheus types.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SnapshotConverterextendsAnyRef"></a>
+      <a id="SnapshotConverter:SnapshotConverter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SnapshotConverter.html"><span class="name">SnapshotConverter</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@SnapshotConverterextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Maps metrics from Kamon to a structure suitable for Prometheus.</p><div class="fullcomment"><div class="comment cmt"><p>Maps metrics from Kamon to a structure suitable for Prometheus.</p><p>Kamon tracks entities associated with one or more instruments, e.g. a
+counter or a gauge.  In the Kamon data model, each entity is uniquely
+identified by a category, a name, and a set of tags (arbitrary string
+key-value mappings).  Kamon supports four different types of instruments:
+counters, histograms, min-max counters, and gauges.  This differs from
+Prometheus' data model.</p><p>In Prometheus, there is no concept of a category, just metric names.
+Prometheus also accepts something like tags, called labels.  Prometheus
+does support several different types: counters, gauges, histograms, and
+summaries.  In these ways, Prometheus is similar to Kamon.  However, in
+Prometheus, each metric can only be of one type.  Additionally, metrics
+with different labels can have the same name (in fact, labels are used to
+support the more complex types).</p><p>This class exists to bridge the two different data models.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="http://kamon.io/core/metrics/instruments/" target="_blank">Kamon: Metric Recording Instruments</a></p></span><span class="cmt"><p><a href="http://kamon.io/core/metrics/core-concepts/" target="_blank">Kamon: Core Concepts</a></p></span><span class="cmt"><p><a href="http://prometheus.io/docs/concepts/metric_types/" target="_blank">Prometheus: Metric Types</a></p></span><span class="cmt"><p><a href="http://prometheus.io/docs/concepts/data_model/" target="_blank">Prometheus: Data Model</a></p></span></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.converter.DefaultPostprocessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DefaultPostprocessor"></a>
+      <a id="DefaultPostprocessor:DefaultPostprocessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DefaultPostprocessor$.html"><span class="name">DefaultPostprocessor</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@DefaultPostprocessor" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SnapshotConverter"></a>
+      <a id="SnapshotConverter:SnapshotConverter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SnapshotConverter$.html"><span class="name">SnapshotConverter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.converter.package@SnapshotConverter" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

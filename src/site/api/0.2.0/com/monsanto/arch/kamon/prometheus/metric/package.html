@@ -1,0 +1,261 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>metric - com.monsanto.arch.kamon.prometheus.metric</title>
+          <meta name="description" content="metric - com.monsanto.arch.kamon.prometheus.metric" />
+          <meta name="keywords" content="metric com.monsanto.arch.kamon.prometheus.metric" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../index.html';
+            var hash = 'com.monsanto.arch.kamon.prometheus.metric.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../../package.html" class="extype" name="com">com</a>.<a href="../../../../package.html" class="extype" name="com.monsanto">monsanto</a>.<a href="../../../package.html" class="extype" name="com.monsanto.arch">arch</a>.<a href="../../package.html" class="extype" name="com.monsanto.arch.kamon">kamon</a>.<a href="../package.html" class="extype" name="com.monsanto.arch.kamon.prometheus">prometheus</a></p>
+        <h1>metric</h1><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">metric</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.metric.Metric" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MetricextendsProductwithSerializable"></a>
+      <a id="Metric:Metric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Metric.html"><span class="name">Metric</span></a><span class="params">(<span name="value">value: <a href="MetricValue.html" class="extype" name="com.monsanto.arch.kamon.prometheus.metric.MetricValue">MetricValue</a></span>, <span name="timestamp">timestamp: <span class="extype" name="kamon.util.MilliTimestamp">MilliTimestamp</span></span>, <span name="labels">labels: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Map.empty</span></span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@MetricextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A metric represents a single item in Prometheus’ data model.</p><div class="fullcomment"><div class="comment cmt"><p>A metric represents a single item in Prometheus’ data model.
+</p></div><dl class="paramcmts block"><dt class="param">value</dt><dd class="cmt"><p>the metric value, note that all values are coerced to doubles</p></dd><dt class="param">timestamp</dt><dd class="cmt"><p>the time of this snapshot</p></dd><dt class="param">labels</dt><dd class="cmt"><p>the labels for the metric, which should conform to Prometheus’ guidelines</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../converter/SnapshotConverter.html" class="extype" name="com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter">SnapshotConverter</a></p></span></dd></dl></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.MetricFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MetricFamilyextendsProductwithSerializable"></a>
+      <a id="MetricFamily:MetricFamily"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="MetricFamily.html"><span class="name">MetricFamily</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="prometheusType">prometheusType: <a href="PrometheusType.html" class="extype" name="com.monsanto.arch.kamon.prometheus.metric.PrometheusType">PrometheusType</a></span>, <span name="help">help: <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Option" class="extype" target="_top">Option</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="metrics">metrics: <span class="extype" name="scala.Seq">Seq</span>[<a href="Metric.html" class="extype" name="com.monsanto.arch.kamon.prometheus.metric.Metric">Metric</a>]</span>)</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Product" class="extype" target="_top">Product</a> with <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Serializable" class="extype" target="_top">Serializable</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@MetricFamilyextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A group of related metrics.</p><div class="fullcomment"><div class="comment cmt"><p>A group of related metrics.  See <a href="../converter/SnapshotConverter.html" class="extype" name="com.monsanto.arch.kamon.prometheus.converter.SnapshotConverter">SnapshotConverter</a>
+for information about the role this class plays in mediating between Kamon’s and Prometheus’ data models.
+</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>the name of the metric, which must conform to Prometheus’ naming guidelines</p></dd><dt class="param">prometheusType</dt><dd class="cmt"><p>the Prometheus metric type to which this family corresponds</p></dd><dt class="param">help</dt><dd class="cmt"><p>optional descriptive text about the metric</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>the individual data that make up this family</p></dd></dl></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.MetricValue" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MetricValueextendsAnyRef"></a>
+      <a id="MetricValue:MetricValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MetricValue.html"><span class="name">MetricValue</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@MetricValueextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Generic trait for all possible metric values.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.PrometheusType" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PrometheusTypeextendsAnyRef"></a>
+      <a id="PrometheusType:PrometheusType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PrometheusType.html"><span class="name">PrometheusType</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@PrometheusTypeextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Designates which type the metric family belongs to according to the Prometheus data model.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.SerialisationFormat" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="SerialisationFormat[T]extendsAnyRef"></a>
+      <a id="SerialisationFormat[T]:SerialisationFormat[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SerialisationFormat.html"><span class="name">SerialisationFormat</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@SerialisationFormat[T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Generic interface for reading and writing snapshots to some sort of custom serialisation format.</p><div class="fullcomment"><div class="comment cmt"><p>Generic interface for reading and writing snapshots to some sort of custom serialisation format.
+</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>the type of the serialised format</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.metric.MetricValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MetricValue"></a>
+      <a id="MetricValue:MetricValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MetricValue$.html"><span class="name">MetricValue</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@MetricValue" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.PrometheusType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrometheusType"></a>
+      <a id="PrometheusType:PrometheusType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PrometheusType$.html"><span class="name">PrometheusType</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@PrometheusType" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.ProtoBufFormat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ProtoBufFormat"></a>
+      <a id="ProtoBufFormat:ProtoBufFormat"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ProtoBufFormat$.html"><span class="name">ProtoBufFormat</span></a><span class="result"> extends <a href="SerialisationFormat.html" class="extype" name="com.monsanto.arch.kamon.prometheus.metric.SerialisationFormat">SerialisationFormat</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Array" class="extype" target="_top">Array</a>[<a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.Byte" class="extype" target="_top">Byte</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@ProtoBufFormat" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Provides support for reading/writing messages using Google’s protocol buffers.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric.TextFormat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TextFormat"></a>
+      <a id="TextFormat:TextFormat"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TextFormat$.html"><span class="name">TextFormat</span></a><span class="result"> extends <a href="SerialisationFormat.html" class="extype" name="com.monsanto.arch.kamon.prometheus.metric.SerialisationFormat">SerialisationFormat</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.metric.package@TextFormat" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Support for serialising to/from the Prometheus text format.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

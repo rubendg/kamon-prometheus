@@ -1,0 +1,314 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>prometheus - com.monsanto.arch.kamon.prometheus</title>
+          <meta name="description" content="prometheus - com.monsanto.arch.kamon.prometheus" />
+          <meta name="keywords" content="prometheus com.monsanto.arch.kamon.prometheus" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../index.html';
+            var hash = 'com.monsanto.arch.kamon.prometheus.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../package.html" class="extype" name="com">com</a>.<a href="../../../package.html" class="extype" name="com.monsanto">monsanto</a>.<a href="../../package.html" class="extype" name="com.monsanto.arch">arch</a>.<a href="../package.html" class="extype" name="com.monsanto.arch.kamon">kamon</a></p>
+        <h1>prometheus</h1><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">prometheus</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.PrometheusExtension" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PrometheusExtensionextendsKamon.Extension"></a>
+      <a id="PrometheusExtension:PrometheusExtension"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PrometheusExtension.html"><span class="name">PrometheusExtension</span></a><span class="result"> extends <span class="extype" name="kamon.Kamon.Extension">Extension</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@PrometheusExtensionextendsKamon.Extension" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A Kamon module that collects metrics from Kamon and stores them in a Prometheus-friendly format.</p><div class="fullcomment"><div class="comment cmt"><p>A Kamon module that collects metrics from Kamon and stores them in a Prometheus-friendly format.</p><h4>Overview</h4><p>If all you need is a Spray route that you can add to your application, you
+do not need to use this module directly, just use the <a href="spray/SprayEndpoint.html" class="extype" name="com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint">SprayEndpoint</a>
+instead.</p><p>However, if you are interested in manually handling the metrics collected by
+the module, read on.</p><h4>Getting a reference to the module</h4><p>Unless otherwise specified, this module will be auto-started by Kamon. As
+such, it will live under the actor system that Kamon uses.  Since Kamon no
+longer exposes the extensions it has loaded, you will need to use either:</p><ul><li><a href="Prometheus$.html#kamonInstance:scala.concurrent.Future[com.monsanto.arch.kamon.prometheus.PrometheusExtension]" class="extmbr" name="com.monsanto.arch.kamon.prometheus.Prometheus#kamonInstance">Prometheus.kamonInstance</a>, a future from a promise that will be
+   delivered once the extension is loaded, or</li><li><a href="Prometheus$.html#awaitKamonInstance(timeout:scala.concurrent.duration.Duration):com.monsanto.arch.kamon.prometheus.PrometheusExtension" class="extmbr" name="com.monsanto.arch.kamon.prometheus.Prometheus#awaitKamonInstance">Prometheus.awaitKamonInstance</a>, a convenience function that will
+   await on the future.</li></ul><p>Using either method, if the module fails to load, the future will
+fail with the underlying cause.</p><h4>Interacting with the module</h4><p>Once you have a reference to the module, you can interact with it via
+<a href="PrometheusExtension.html#ref:akka.actor.ActorRef" class="extmbr" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension#ref">ref</a>, an actor reference.  There are two patterns for interacting with
+the modules:</p><ol class="decimal"><li>Requesting the current snapshot, which may done without an actor</li><li>Subscribing an actor to get updates from the module</li></ol><p>In either case, once you have a snapshot, you can convert it to a format
+that Prometheus can understand by using either <a href="metric/TextFormat$.html#format(snapshot:Seq[com.monsanto.arch.kamon.prometheus.metric.MetricFamily]):String" class="extmbr" name="com.monsanto.arch.kamon.prometheus.metric.TextFormat#format">TextFormat.format</a>
+or <a href="metric/ProtoBufFormat$.html#format(snapshot:Seq[com.monsanto.arch.kamon.prometheus.metric.MetricFamily]):Array[Byte]" class="extmbr" name="com.monsanto.arch.kamon.prometheus.metric.ProtoBufFormat#format">ProtoBuf.format</a>.</p><h5>Requesting the current snapshot</h5><p>If you just want to get the current snapshot from the module, you will
+need to send it the <a href="PrometheusExtension$$GetCurrentSnapshot$.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.GetCurrentSnapshot">GetCurrentSnapshot</a>
+message and it will reply with either <a href="PrometheusExtension$$NoCurrentSnapshot$.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.NoCurrentSnapshot">NoCurrentSnapshot</a>
+or a <a href="PrometheusExtension$$Snapshot.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.Snapshot">Snapshot</a> containing the current snapshot.</p><pre><span class="kw">import</span> com.monsanto.arch.kamon.prometheus.Prometheus
+<span class="kw">import</span> com.monsanto.arch.kamon.prometheus.PrometheusExtension._
+<span class="kw">import</span> akka.pattern.ask
+<span class="kw">import</span> scala.concurrent.duration._
+
+<span class="cmt">// doing everything synchronously, which has worse performance but is</span>
+<span class="cmt">// convenient</span>
+<span class="kw">val</span> extension =  Prometheus.awaitKamonInstance()
+<span class="kw">val</span> currentState = Await.result(extension.ref.ask(GetCurrentSnapshot)(<span class="num">1</span> second), <span class="num">1</span> second)
+
+<span class="cmt">// it is also possible to do things completely asynchronously</span>
+<span class="kw">for</span> {
+  extension    ← Prometheus.kamonInstance
+  currentState ← extension.ref.ask(GetCurrentSnapshot)(<span class="num">1</span> second)
+} {
+  currentState <span class="kw">match</span> {
+    <span class="kw">case</span> NoCurrentSnapshot ⇒
+      <span class="cmt">// no state…</span>
+    <span class="kw">case</span> Snapshot(s) ⇒
+      <span class="cmt">// do something…</span>
+  }
+}
+
+<span class="cmt">// finally, you could do all of this from an actor, but that is left as</span>
+<span class="cmt">// an exercise to the reader</span></pre><h5>Subscribing to snapshot updates</h5><p>If you are interested in getting periodic updates from the module, then
+you will need to send it a <a href="PrometheusExtension$$Subscribe$.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.Subscribe">Subscribe</a>
+message after which you will periodically receive <a href="PrometheusExtension$$Snapshot.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.Snapshot">Snapshot</a>
+messages with the latest refresh.</p><pre><span class="kw">import</span> akka.actor.ActorDSL._
+<span class="kw">import</span> com.monsanto.arch.kamon.prometheus.Prometheus
+<span class="kw">import</span> com.monsanto.arch.kamon.prometheus.PrometheusExtension._
+
+Prometheus.kamonInstance map { ext ⇒
+  <span class="kw">val</span> a = actor(<span class="kw">new</span> Act {
+    become {
+      <span class="kw">case</span> Snapshot(s) ⇒
+        <span class="cmt">// do something…</span>
+    }
+  })
+  ext.ref.tell(Subscribe, a)
+}</pre><p>In order to unsubscribe from updates, just send an <a href="PrometheusExtension$$Unsubscribe$.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension.Unsubscribe">Unubscribe</a>
+message from the subscriber.  A subscriber will also be unsubscribed
+upon its death.
+</p></div></div>
+    </li><li name="com.monsanto.arch.kamon.prometheus.PrometheusSettings" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrometheusSettingsextendsAnyRef"></a>
+      <a id="PrometheusSettings:PrometheusSettings"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PrometheusSettings.html"><span class="name">PrometheusSettings</span></a><span class="result"> extends <a href="http://www.scala-lang.org/api/2.11.8/index.html#scala.AnyRef" class="extype" target="_top">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@PrometheusSettingsextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A settings object used for configuring how the extension should behave.</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.Prometheus" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Prometheus"></a>
+      <a id="Prometheus:Prometheus"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Prometheus$.html"><span class="name">Prometheus</span></a><span class="result"> extends <a href="http://doc.akka.io/api/akka/2.4.9/index.html#akka.actor.ExtensionId" class="extype" target="_top">ExtensionId</a>[<a href="PrometheusExtension.html" class="extype" name="com.monsanto.arch.kamon.prometheus.PrometheusExtension">PrometheusExtension</a>] with <a href="http://doc.akka.io/api/akka/2.4.9/index.html#akka.actor.ExtensionIdProvider" class="extype" target="_top">ExtensionIdProvider</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@Prometheus" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Provides the necessary magic to register the extension with Kamon.</p>
+    </li><li name="com.monsanto.arch.kamon.prometheus.PrometheusExtension" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrometheusExtension"></a>
+      <a id="PrometheusExtension:PrometheusExtension"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PrometheusExtension$.html"><span class="name">PrometheusExtension</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@PrometheusExtension" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.akka_http" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="akka_http"></a>
+      <a id="akka_http:akka_http"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="akka_http/package.html"><span class="name">akka_http</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@akka_http" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.converter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="converter"></a>
+      <a id="converter:converter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="converter/package.html"><span class="name">converter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@converter" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.metric" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="metric"></a>
+      <a id="metric:metric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="metric/package.html"><span class="name">metric</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@metric" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.proto" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="proto"></a>
+      <a id="proto:proto"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="proto/package.html"><span class="name">proto</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@proto" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.monsanto.arch.kamon.prometheus.spray" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="spray"></a>
+      <a id="spray:spray"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="spray/package.html"><span class="name">spray</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#com.monsanto.arch.kamon.prometheus.package@spray" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
