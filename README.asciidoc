@@ -11,8 +11,8 @@ This library provides a Kamon module that can serve metrics to
 http://prometheus.io/[Prometheus], an open source service monitoring system and
 time series database.  Since Prometheus uses a scraping mechanism and its own
 data model, this module bridges the gap between the two.  It converts Kamon
-metrics into a Prometheus-friendly format and provides a Spray route that your
-application can use to serve metrics to Prometheus.
+metrics into a Prometheus-friendly format and provides integrations for both
+Spray and Akka HTTP so that your application can serve metrics to Prometheus.
 
 Features
 --------
@@ -20,10 +20,11 @@ Features
 * Converts Kamon metrics data to conform to Prometheus’ data model, including:
 ** Reasonably handles all Kamon entities, including custom entities
 ** Preservation of units of measurement
-* Provides a Spray route that supports:
+* Provides Spray and Akka HTTP route that supports:
 ** Both text and https://developers.google.com/protocol-buffers/[Protocol
    buffer] representation formats
 ** Optional gzip compression
+* Allows collection of snapshots without an endpoint using an actor
 * Allows configuration of:
 ** Refresh interval to match Prometheus
 ** Metric subscriptions to export
@@ -40,7 +41,7 @@ your `build.sbt`:
 
 [source,scala]
 ------------------------------------------------------------------------------
-libraryDependencies += "com.monsanto.arch" %% "kamon-prometheus" % "0.1.2"
+libraryDependencies += "com.monsanto.arch" %% "kamon-prometheus" % "0.2.0"
 ------------------------------------------------------------------------------
 
 You may also need to add JCenter as a resolver:
@@ -63,9 +64,10 @@ This module depends on:
 
 * http://akka.io[Akka actors]
 * http://kamon.io[Kamon core]
-* http://spray.io/[Spray routing]
 * https://github.com/typesafehub/config[Typesafe config]
 * https://developers.google.com/protocol-buffers/[Protocol buffers for Java]
+* http://akka.io[Akka HTTP] _(optional)_
+* http://spray.io/[Spray routing] _(optional)_
 * https://github.com/scala/scala-parser-combinators[Scala parser combinators] _(optional)_
 
 Additional dependencies are required if you are interested in
@@ -144,30 +146,36 @@ http://prometheus.io/docs/concepts/data_model/#metric-names-and-labels[Prometheu
 Usage
 -----
 
-=== Creating the endpoint
+There are currently three principal ways to use _kamon-prometheus_:
+
+1. Using the Spray endpoint
+2. Using the Akka HTTP endpoint
+3. Collecting metrics via an Actor
+
+Once you have made the metrics available, you will need to configure
+Prometheus to scrape your application.
+
+=== Using the Spray endpoint
 
 The module provides a Spray route which you can access via
-`Kamon(Prometheus).route`.  You can place this route anywhere in your
-application, but keep in mind that Prometheus scrapes `/metrics` by default.
-The following is the code for a minimal application that will serve metrics
-from `http://localhost:8888/metrics`:
+`SprayEndpoint(system).route` where `system` is an actor system.  You can
+place this route anywhere in your application, but keep in mind that Prometheus
+scrapes `/metrics` by default.  The following is the code for a minimal
+application that will serve metrics from `http://localhost:8888/metrics`:
 
 [source,scala]
-.A minimal application
+.A minimal Spray application
 ------------------------------------------------------------------------------
 import akka.actor.ActorSystem
-import com.monsanto.arch.kamon.prometheus.Prometheus
-import kamon.Kamon
+import com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint
 import spray.routing.SimpleRoutingApp
 
 object Main extends App with SimpleRoutingApp {
-  Kamon.start()
-
   implicit val actorSystem = ActorSystem()
 
   startServer("localhost", 8888) {
     path("metrics") {
-      Kamon(Prometheus).route
+      SprayEndpoint(actorSystem).route
     }
   }
 }
@@ -178,6 +186,33 @@ handle compression and media type negotiation.  If there is no content yet
 (generally before the first set of metrics has been collected), the route will
 return a _No Content_ response (204).
 
+=== Using the Akka HTTP endpoint
+
+Using the Akka HTTP endpoint is just like using the Spray endpoint above,
+except that you use a different Akka extension.
+
+[source,scala]
+.A minimal Akka HTTP application
+------------------------------------------------------------------------------
+import akka.actor.ActorSystem
+import com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint
+import spray.routing.SimpleRoutingApp
+
+object Main extends App with SimpleRoutingApp {
+  implicit val actorSystem = ActorSystem("Demo")
+
+  startServer("localhost", 8888) {
+    path("metrics") {
+      SprayEndpoint(actorSystem).route
+    }
+  }
+}
+------------------------------------------------------------------------------
+
+=== Getting snapshots with an actor
+
+For this functionality, please consult the documentation for
+http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.PrometheusExtension[PrometheusExtension].
 
 === Consuming the metrics
 

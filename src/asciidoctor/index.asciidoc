@@ -3,7 +3,7 @@ kamon-prometheus
 Daniel Solano_Gómez
 :description: kamon-prometheus is a Kamon module which enables integration with the Prometheus \
 monitoring system.
-:keywords: kamon, metrics, prometheus, scala
+:keywords: kamon, metrics, prometheus, scala, akka-http
 
 include::../../README.asciidoc[tags=preamble]
 

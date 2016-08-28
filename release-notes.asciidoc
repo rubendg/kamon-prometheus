@@ -3,6 +3,19 @@ kamon-prometheus: release notes
 
 // tag::release-notes[]
 
+=== 0.2.0
+
+* New features
+** There is now support for an
+   http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.akka_http.AkkaHttpEndpoint[Akka HTTP endpoint]
+** You can now get use the module without any endpoints.  Instead, you can
+   http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.PrometheusExtension[get metrics directly using an actor].
+* Breaking changes
+** To get the route for Spray, you no longer invoke `Kamon(Prometheus).route`,
+   instead use the new http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint[SprayEndpoint]
+** `spray-routing` is not longer a hard dependency for the library
+** A number of internal APIs that where public have been made private
+
 === 0.1.2
 
 * Initial public release
