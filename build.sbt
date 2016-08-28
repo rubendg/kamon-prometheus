@@ -19,6 +19,7 @@ lazy val commonSettings = Seq(
   resolvers += Resolver.jcenterRepo,
   apiMappingsScala ++= Map(
     ("com.typesafe.akka", "akka-actor") → "http://doc.akka.io/api/akka/%s",
+    ("com.typesafe.akka", "akka-http-experimental") → "http://doc.akka.io/api/akka/%s",
     ("io.spray", "spray-routing") → "http://spray.io/documentation/1.1-SNAPSHOT/api/"
   ),
   apiMappingsJava ++= Map(
@@ -188,11 +189,15 @@ lazy val ghPagesSettings =
 
 lazy val `kamon-prometheus` = (project in file("."))
   .disablePlugins(sbtassembly.AssemblyPlugin)
-  .enablePlugins(AsciidoctorPlugin, SiteScaladocPlugin)
   .aggregate(library, demo)
   .settings(
     commonSettings,
     noPublishing,
     ghPagesSettings,
-    siteSubdirName in SiteScaladoc := "api/snapshot"
+    unidocSettings,
+    site.settings,
+    site.asciidoctorSupport(),
+    site.includeScaladoc("api/snapshot"),
+    UnidocKeys.unidocProjectFilter in (ScalaUnidoc, UnidocKeys.unidoc) := inAnyProject -- inProjects(demo),
+    site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api/snapshot")
   )
