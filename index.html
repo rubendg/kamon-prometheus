@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.2">
 <meta name="description" content="kamon-prometheus is a Kamon module which enables integration with the Prometheus monitoring system.">
-<meta name="keywords" content="kamon, metrics, prometheus, scala">
+<meta name="keywords" content="kamon, metrics, prometheus, scala, akka-http">
 <meta name="author" content="Daniel Solano Gómez">
 <title>kamon-prometheus</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
@@ -423,12 +423,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
+<p><span class="image"><a class="image" href="https://bintray.com/monsanto/maven/kamon-prometheus/_latestVersion"><img src="https://api.bintray.com/packages/monsanto/maven/kamon-prometheus/images/download.svg" alt="download"></a></span>
+<span class="image"><a class="image" href="https://coveralls.io/github/MonsantoCo/kamon-prometheus?branch=master"><img src="https://coveralls.io/repos/github/MonsantoCo/kamon-prometheus/badge.svg?branch=master" alt="Coverage status"></a></span>
+<span class="image"><a class="image" href="https://travis-ci.org/MonsantoCo/kamon-prometheus"><img src="https://travis-ci.org/MonsantoCo/kamon-prometheus.svg?branch=master" alt="Build Status"></a></span></p>
+</div>
+<div class="paragraph">
 <p>This library provides a Kamon module that can serve metrics to
 <a href="http://prometheus.io/">Prometheus</a>, an open source service monitoring system and
 time series database.  Since Prometheus uses a scraping mechanism and its own
 data model, this module bridges the gap between the two.  It converts Kamon
-metrics into a Prometheus-friendly format and provides a Spray route that your
-application can use to serve metrics to Prometheus.</p>
+metrics into a Prometheus-friendly format and provides integrations for both
+Spray and Akka HTTP so that your application can serve metrics to Prometheus.</p>
 </div>
 </div>
 </div>
@@ -451,7 +456,7 @@ application can use to serve metrics to Prometheus.</p>
 </div>
 </li>
 <li>
-<p>Provides a Spray route that supports:</p>
+<p>Provides Spray and Akka HTTP route that supports:</p>
 <div class="ulist">
 <ul>
 <li>
@@ -463,6 +468,9 @@ buffer</a> representation formats</p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p>Allows collection of snapshots without an endpoint using an actor</p>
 </li>
 <li>
 <p>Allows configuration of:</p>
@@ -513,6 +521,45 @@ buffer</a> representation formats</p>
 <h2 id="_release_notes">Release notes</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="_0_2_0">0.2.0</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>New features</p>
+<div class="ulist">
+<ul>
+<li>
+<p>There is now support for an
+<a href="http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.akka_http.AkkaHttpEndpoint">Akka HTTP endpoint</a></p>
+</li>
+<li>
+<p>You can now get use the module without any endpoints.  Instead, you can
+<a href="http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.PrometheusExtension">get metrics directly using an actor</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Breaking changes</p>
+<div class="ulist">
+<ul>
+<li>
+<p>To get the route for Spray, you no longer invoke <code>Kamon(Prometheus).route</code>,
+instead use the new <a href="http://monsantoco.github.io/kamon-prometheus/api/0.2.0/#com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint">SprayEndpoint</a></p>
+</li>
+<li>
+<p><code>spray-routing</code> is not longer a hard dependency for the library</p>
+</li>
+<li>
+<p>A number of internal APIs that where public have been made private</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_0_1_2">0.1.2</h3>
 <div class="ulist">
 <ul>
@@ -527,7 +574,7 @@ buffer</a> representation formats</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-12-09 19:16:31 -06:00
+Last updated 2016-08-27 22:45:18 -05:00
 </div>
 </div>
 </body>

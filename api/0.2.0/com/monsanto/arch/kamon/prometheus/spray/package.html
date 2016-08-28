@@ -1,0 +1,162 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>spray - com.monsanto.arch.kamon.prometheus.spray</title>
+          <meta name="description" content="spray - com.monsanto.arch.kamon.prometheus.spray" />
+          <meta name="keywords" content="spray com.monsanto.arch.kamon.prometheus.spray" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../index.html';
+            var hash = 'com.monsanto.arch.kamon.prometheus.spray.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../../../../lib/package_big.png" />
+        <p id="owner"><a href="../../../../../package.html" class="extype" name="com">com</a>.<a href="../../../../package.html" class="extype" name="com.monsanto">monsanto</a>.<a href="../../../package.html" class="extype" name="com.monsanto.arch">arch</a>.<a href="../../package.html" class="extype" name="com.monsanto.arch.kamon">kamon</a>.<a href="../package.html" class="extype" name="com.monsanto.arch.kamon.prometheus">prometheus</a></p>
+        <h1>spray</h1><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.spray.package" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">spray</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="SprayEndpointextendsExtension"></a>
+      <a id="SprayEndpoint:SprayEndpoint"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SprayEndpoint.html"><span class="name">SprayEndpoint</span></a><span class="result"> extends <a href="http://doc.akka.io/api/akka/2.4.9/index.html#akka.actor.Extension" class="extype" target="_top">Extension</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.spray.package@SprayEndpointextendsExtension" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An Akka extension for creating a Spray-based endpoint for serving Kamon
+metrics to Prometheus.</p><div class="fullcomment"><div class="comment cmt"><p>An Akka extension for creating a Spray-based endpoint for serving Kamon
+metrics to Prometheus.  It supports both the text and protocol buffer
+formats and optional gzip encoding.  All content negotiation is handled
+through Spray.</p><h4>Usage</h4><p>As an Akka extension, you will need to instantiate the extension using
+an actor system.  Once you have an a reference to the extension, you
+can simply call <a href="SprayEndpoint.html#route:spray.routing.Route" class="extmbr" name="com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint#route">route</a> to get a Spray route
+that will handle requests from Prometheus.</p><pre><span class="kw">import</span> akka.actor.ActorSystem
+<span class="kw">import</span> com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint
+<span class="kw">import</span> spray.routing.SimpleRoutingApp
+
+<span class="kw">object</span> Main <span class="kw">extends</span> <span class="std">App</span> <span class="kw">with</span> SimpleRoutingApp {
+  <span class="kw">implicit</span> <span class="kw">val</span> actorSystem = ActorSystem(<span class="lit">"Demo"</span>)
+
+  startServer(<span class="lit">"localhost"</span>, <span class="num">8888</span>) {
+    path(<span class="lit">"metrics"</span>) {
+      SprayEndpoint(actorSystem).route
+    }
+  }
+}</pre><p><b>NOTE:</b>  When you instantiate the extension, it will asynchronously
+register itself with the Kamon Prometheus extension and start receiving
+snapshots.  <b>However, if Kamon fails to instantiate the Prometheus
+extension, the Spray endpoint will never serve any data.</b>  Errors will
+be logged.
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SprayEndpoint"></a>
+      <a id="SprayEndpoint:SprayEndpoint"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SprayEndpoint$.html"><span class="name">SprayEndpoint</span></a><span class="result"> extends <a href="http://doc.akka.io/api/akka/2.4.9/index.html#akka.actor.ExtensionId" class="extype" target="_top">ExtensionId</a>[<a href="SprayEndpoint.html" class="extype" name="com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint">SprayEndpoint</a>] with <a href="http://doc.akka.io/api/akka/2.4.9/index.html#akka.actor.ExtensionIdProvider" class="extype" target="_top">ExtensionIdProvider</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#com.monsanto.arch.kamon.prometheus.spray.package@SprayEndpoint" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The Akka extension support for the <code>SprayEndpoint</code>.</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
