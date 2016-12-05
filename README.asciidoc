@@ -195,17 +195,22 @@ except that you use a different Akka extension.
 .A minimal Akka HTTP application
 ------------------------------------------------------------------------------
 import akka.actor.ActorSystem
-import com.monsanto.arch.kamon.prometheus.spray.SprayEndpoint
-import spray.routing.SimpleRoutingApp
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+import com.monsanto.arch.kamon.prometheus.akka_http.AkkaHttpEndpoint
 
-object Main extends App with SimpleRoutingApp {
-  implicit val actorSystem = ActorSystem("Demo")
+object Main extends App {
+  implicit val system = ActorSystem()
+  implicit val materializer = ActorMaterializer()
 
-  startServer("localhost", 8888) {
+  val route = {
     path("metrics") {
-      SprayEndpoint(actorSystem).route
+      AkkaHttpEndpoint(system).route
     }
   }
+
+  val bindingFuture = Http().bindAndHandle(route, "localhost", 8888)
 }
 ------------------------------------------------------------------------------
 
