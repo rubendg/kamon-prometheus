@@ -64,10 +64,10 @@ private[akka_http] class DefaultAkkaHttpEndpoint(system: ExtendedActorSystem) ex
     val log = Logging(system, classOf[AkkaHttpEndpoint])
     result match {
       case Success(ext) ⇒
-        log.debug("SprayEndpoint is subscribing to Kamon Prometheus updates")
+        log.debug("AkkaHttpEndpoint is subscribing to Kamon Prometheus updates")
         ext.ref.tell(PrometheusExtension.Subscribe, updater)
       case Failure(t) ⇒
-        log.error(t, "Kamon Prometheus module failed to load, SprayEndpoint will never serve data")
+        log.error(t, "Kamon Prometheus module failed to load, AkkaHttpEndpoint will never serve data")
     }
   }(system.dispatcher)
 }
