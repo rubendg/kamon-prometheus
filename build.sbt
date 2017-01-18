@@ -1,9 +1,10 @@
 import java.util.Date
 import sbtprotobuf.ProtobufPlugin
 
-val akkaVersion = "2.4.9"
-val sprayVersion = "1.3.3"
-val kamonVersion = "0.6.2"
+val akkaVersion = "2.4.16"
+val akkaHttpVersion = "10.0.1"
+val sprayVersion = "1.3.4"
+val kamonVersion = "0.6.3"
 
 lazy val commonSettings = Seq(
   homepage := Some(url("https://monsantoco.github.io/kamon-prometheus")),
@@ -70,26 +71,26 @@ lazy val library = (project in file("library"))
     description := "Kamon module to export metrics to Prometheus",
     libraryDependencies ++= Seq(
       "io.kamon"               %% "kamon-core"               % kamonVersion,
-      "io.spray"               %% "spray-routing"            % sprayVersion % "provided",
+      "io.spray"               %% "spray-routing"            % sprayVersion     % "provided",
       "com.typesafe.akka"      %% "akka-actor"               % akkaVersion,
-      "com.typesafe.akka"      %% "akka-http-experimental"   % akkaVersion  % "provided",
-      "com.typesafe"            % "config"                   % "1.3.0",
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"      % "provided",
+      "com.typesafe.akka"      %% "akka-http"                % akkaHttpVersion  % "provided",
+      "com.typesafe"            % "config"                   % "1.3.1",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5"          % "provided",
       // -- testing --
-      "ch.qos.logback"     % "logback-classic"   % "1.1.7"      % testConfigs,
-      "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion  % "test",
-      "com.typesafe.akka" %% "akka-slf4j"        % akkaVersion  % testConfigs,
-      "com.typesafe.akka" %% "akka-testkit"      % akkaVersion  % "test",
-      "org.scalatest"     %% "scalatest"         % "3.0.0"      % testConfigs,
-      "io.kamon"          %% "kamon-akka"        % kamonVersion % "test",
-      "io.spray"          %% "spray-testkit"     % sprayVersion % "test",
-      "org.scalacheck"    %% "scalacheck"        % "1.13.2"     % "test"
+      "ch.qos.logback"     % "logback-classic"   % "1.1.7"          % testConfigs,
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion  % "test",
+      "com.typesafe.akka" %% "akka-slf4j"        % akkaVersion      % testConfigs,
+      "com.typesafe.akka" %% "akka-testkit"      % akkaVersion      % "test",
+      "org.scalatest"     %% "scalatest"         % "3.0.1"          % testConfigs,
+      "io.kamon"          %% "kamon-akka"        % kamonVersion     % "test",
+      "io.spray"          %% "spray-testkit"     % sprayVersion     % "test",
+      "org.scalacheck"    %% "scalacheck"        % "1.13.4"         % "test"
     ),
     dependencyOverrides ++= Set(
       "com.typesafe.akka"      %% "akka-actor"    % akkaVersion,
       "org.scala-lang"          % "scala-library" % scalaVersion.value,
       "org.scala-lang"          % "scala-reflect" % scalaVersion.value,
-      "org.scala-lang.modules" %% "scala-xml"     % "1.0.4"
+      "org.scala-lang.modules" %% "scala-xml"     % "1.0.6"
     ),
     version in ProtobufPlugin.protobufConfig := "2.6.1",
 

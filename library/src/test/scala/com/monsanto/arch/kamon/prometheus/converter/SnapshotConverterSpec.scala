@@ -15,6 +15,7 @@ import kamon.metric.SubscriptionsDispatcher.TickMetricSnapshot
 import kamon.metric._
 import kamon.metric.instrument.{InstrumentFactory, Memory, Time, UnitOfMeasurement}
 import kamon.util.executors.{ForkJoinPoolMetrics, ThreadPoolExecutorMetrics}
+import kamon.util.MilliTimestamp
 import org.scalacheck.Gen
 import org.scalatest.LoneElement._
 import org.scalatest.Matchers._
@@ -958,7 +959,6 @@ class SnapshotConverterSpec extends WordSpec {
         Entity(name, Smorgasbord.category, tags)
       }
 
-
       "nothing special" in {
         val name = "test_smorgasbord"
         val count = 3L
@@ -1215,6 +1215,13 @@ class SnapshotConverterSpec extends WordSpec {
           KamonNameLabel → dispatcherName,
           "dispatcher_name" → dispatcherName)
 
+        val resultMap = result.map(mf => (mf.name, mf)).toMap
+        val submissionTimestamp = try {
+          resultMap("akka_fork_join_pool_dispatcher_queued_submission_count").metrics(0).timestamp
+        } catch {
+          case t: Throwable => MilliTimestamp(-1)
+        }
+
         result should contain theSameElementsAs
         Seq(
           MetricFamily(
@@ -1241,7 +1248,14 @@ class SnapshotConverterSpec extends WordSpec {
             "akka_fork_join_pool_dispatcher_queued_task_count",
             PrometheusType.Histogram,
             Some(AkkaForkJoinPoolDispatcherQueuedTaskCountHelp),
-            Seq(Metric(MetricValue.Histogram(tick.metrics(entity).gauge("queued-task-count").get), end, labels))))
+            Seq(Metric(MetricValue.Histogram(tick.metrics(entity).gauge("queued-task-count").get), end, labels))),
+          MetricFamily(
+           "akka_fork_join_pool_dispatcher_queued_submission_count",
+           PrometheusType.Histogram,
+           None,
+           List(Metric(MetricValue.Histogram(List(MetricValue.Bucket(Double.PositiveInfinity, 0)), 0 , 0.0),
+               submissionTimestamp, labels)))
+        )
       }
 
       "a thread pool executor" in {
