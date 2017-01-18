@@ -116,14 +116,16 @@ lazy val demo = (project in file("demo"))
       "com.monsanto.arch" %% "spray-kamon-metrics"  % "0.1.3"
     ),
     fork in run := true,
-    javaOptions in run <++= AspectjKeys.weaverOptions in Aspectj,
-    javaOptions in reStart <++= AspectjKeys.weaverOptions in Aspectj,
-    assemblyJarName in assembly <<= (name, version) map { (name, version) ⇒ s"$name-$version.jar" },
-    docker <<= docker.dependsOn(assembly),
-    imageName in docker := ImageName(
-      namespace = Some("monsantoco"),
-      repository = "kamon-prometheus-demo",
-      tag = Some("latest")
+    javaOptions in run ++= { (AspectjKeys.weaverOptions in Aspectj).value },
+    javaOptions in reStart ++= { (AspectjKeys.weaverOptions in Aspectj).value },
+    assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
+    docker := (docker.dependsOn(assembly)).value,
+    imageNames in docker := Seq(
+      ImageName(
+        namespace = Some("monsantoco"),
+        repository = "kamon-prometheus-demo",
+        tag = Some("latest")
+      )
     ),
     dockerfile in docker := {
       import sbtdocker.Instructions._
