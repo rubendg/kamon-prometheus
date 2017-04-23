@@ -245,12 +245,7 @@ Development
 [[building]]
 === Building the library
 
-You can use `sbt` to build the library, but you will need to have Google’s
-protocol buffers compiler `protoc` on your path.  You can
-https://developers.google.com/protocol-buffers/docs/downloads[download]
-Protocol buffers directly from Google.  However, there may be simpler options.
-For example, on OS X, you can use http://brew.sh[homebrew] and just `brew
-install protobuf`.
+You can use `sbt` to build the library.
 
 Additionally, to build the demo, you will need to have Docker set up.
 

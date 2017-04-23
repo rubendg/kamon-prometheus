@@ -92,7 +92,9 @@ lazy val library = (project in file("library"))
       "org.scala-lang"          % "scala-reflect" % scalaVersion.value,
       "org.scala-lang.modules" %% "scala-xml"     % "1.0.6"
     ),
-    version in ProtobufPlugin.protobufConfig := "2.6.1",
+    ProtobufPlugin.runProtoc in ProtobufPlugin.protobufConfig := { args =>
+      com.github.os72.protocjar.Protoc.runProtoc( args.toArray)
+    },
 
     // We have to ensure that Kamon starts/stops serially
     parallelExecution in Test := false,

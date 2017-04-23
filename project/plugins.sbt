@@ -14,7 +14,7 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "0.8.2")
 
-addSbtPlugin("com.github.gseitz" % "sbt-protobuf" % "0.5.3")
+addSbtPlugin("com.github.gseitz" % "sbt-protobuf" % "0.5.5")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.4")
 
@@ -24,4 +24,8 @@ addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.3")
 
 dependencyOverrides ++= Set(
   "com.typesafe.sbt" % "sbt-site" % "0.8.2"
+)
+
+libraryDependencies ++= Seq(
+  "com.github.os72" % "protoc-jar" % "2.6.1.4"
 )
